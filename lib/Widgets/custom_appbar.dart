@@ -7,7 +7,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double elevation;
 
   const CustomAppBar(
-      {this.onBackPressed,
+      {super.key,
+      this.onBackPressed,
       this.centerTitle = true,
       this.title = ' ',
       this.elevation = 4.0});

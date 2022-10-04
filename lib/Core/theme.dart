@@ -22,57 +22,57 @@ class ApplicationSizes {
 }
 
 class ApplicationColors {
-  static final Color primaryColorLight = Color(0xFF0489C2);
-  static final Color primaryColorDark = Color(0xFF0489C2);
+  static const Color primaryColorLight = Color(0xFF0489C2);
+  static const Color primaryColorDark = Color(0xFF0489C2);
 
-  static final Color accentColorLight = Color(0xFF0489C2);
-  static final Color accentColorDark = Color(0xFF0489C2);
+  static const Color accentColorLight = Color(0xFF0489C2);
+  static const Color accentColorDark = Color(0xFF0489C2);
 
-  static final Color backgroundLight = Color(0xFFF4F4F4);
-  static final Color backgroundDark = Color(0xFFF4F4F4);
-  static final Color gray = Color(0xFF999999);
+  static const Color backgroundLight = Color(0xFFF4F4F4);
+  static const Color backgroundDark = Color(0xFFF4F4F4);
+  static const Color gray = Color(0xFF999999);
 
-  static final Color primaryTextColorLight = Color(0xFF282828);
-  static final Color primaryTextColorDark = Color(0xFF282828);
+  static const Color primaryTextColorLight = Color(0xFF282828);
+  static const Color primaryTextColorDark = Color(0xFF282828);
 
-  static final Color transparentColor = Color(0xFFFFFFFFFF);
+  static const Color transparentColor = Colors.transparent;
 
-  static final Color yellowColor = Color(0xFFE99A4A);
-  static final Color errorColor = Color(0xFFff006e);
+  static const Color yellowColor = Color(0xFFE99A4A);
+  static const Color errorColor = Color(0xFFff006e);
 
-  static final Color blueColor = Color(0xFF16007e);
+  static const Color blueColor = Color(0xFF16007e);
 }
 
 class ChatAppTheme {
   static get lightTheme {
     final themeData = ThemeData.light();
     final originalTextTheme = themeData.textTheme.copyWith(
-        headline4: TextStyle(color: ApplicationColors.primaryTextColorLight));
+        headline4:
+            const TextStyle(color: ApplicationColors.primaryTextColorLight));
     return themeData.copyWith(
         primaryColor: ApplicationColors.primaryColorLight,
         scaffoldBackgroundColor: ApplicationColors.transparentColor,
-        accentColor: ApplicationColors.accentColorLight,
         backgroundColor: ApplicationColors.backgroundLight,
         textTheme: originalTextTheme.copyWith(
-          headline1: TextStyle(
+          headline1: const TextStyle(
               color: ApplicationColors.primaryTextColorLight,
               fontSize: 28,
               fontFamily: 'Maccabi',
               fontWeight: FontWeight.w700),
-          bodyText1: TextStyle(
+          bodyText1: const TextStyle(
               height: 1.5,
               color: ApplicationColors.primaryTextColorLight,
               fontSize: 16,
               fontFamily: 'Maccabi',
               fontWeight: FontWeight.w700),
-          bodyText2: TextStyle(
+          bodyText2: const TextStyle(
               color: ApplicationColors.primaryTextColorLight,
               height: 1.4,
               fontSize: 14,
               letterSpacing: 0.14,
               fontFamily: 'Maccabi',
               fontWeight: FontWeight.w400),
-          overline: TextStyle(
+          overline: const TextStyle(
               height: 1.2,
               color: ApplicationColors.primaryTextColorLight,
               fontSize: 14,
@@ -85,38 +85,38 @@ class ChatAppTheme {
   static get darkTheme {
     final themeData = ThemeData.dark();
     final originalTextTheme = themeData.textTheme.copyWith(
-        headline4: TextStyle(color: ApplicationColors.primaryTextColorDark));
+        headline4:
+            const TextStyle(color: ApplicationColors.primaryTextColorDark));
     return themeData.copyWith(
         primaryColor: ApplicationColors.primaryColorDark,
         scaffoldBackgroundColor: ApplicationColors.transparentColor,
-        accentColor: ApplicationColors.accentColorDark,
         backgroundColor: ApplicationColors.backgroundDark,
         textTheme: originalTextTheme.copyWith(
-          headline1: TextStyle(
+          headline1: const TextStyle(
               color: ApplicationColors.primaryTextColorLight,
               fontSize: 28,
               fontFamily: 'Maccabi',
               fontWeight: FontWeight.w700),
-          bodyText1: TextStyle(
+          bodyText1: const TextStyle(
               height: 1.5,
               color: ApplicationColors.primaryTextColorDark,
               fontSize: 16,
               fontFamily: 'Maccabi',
               fontWeight: FontWeight.w700),
-          bodyText2: TextStyle(
+          bodyText2: const TextStyle(
               color: ApplicationColors.primaryTextColorDark,
               height: 1.4,
               fontSize: 14,
               letterSpacing: 0.14,
               fontFamily: 'Maccabi',
               fontWeight: FontWeight.w400),
-          caption: TextStyle(
+          caption: const TextStyle(
             color: ApplicationColors.primaryColorDark,
             fontSize: 12,
             fontFamily: 'Maccabi',
             fontWeight: FontWeight.w700,
           ),
-          overline: TextStyle(
+          overline: const TextStyle(
               height: 1.2,
               color: ApplicationColors.primaryTextColorDark,
               fontSize: 14,
