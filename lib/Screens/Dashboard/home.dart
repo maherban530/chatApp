@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../Core/route_path.dart';
+import '../../Models/user_model.dart';
 import '../../Provider/auth_provider.dart';
+import '../../Widgets/utils.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,46 +15,76 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   @override
-  void initState() {
-    final provider = Provider.of<AuthProvider>(context, listen: false);
-    provider.getUsersData(context);
-    // print(usersList);
-    super.initState();
+  Widget build(BuildContext context) {
+    ThemeData applicationTheme = Theme.of(context);
+
+    return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+          actions: [
+            TextButton.icon(
+              style: applicationTheme.textButtonTheme.style,
+              onPressed: () {
+                final provider =
+                    Provider.of<AuthProvider>(context, listen: false);
+                provider.logOut();
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.signup,
+                );
+              },
+              icon: const Icon(Icons.logout),
+              label: const Text("LogOut"),
+            ),
+          ],
+        ),
+        body: StreamProvider(
+          create: (BuildContext context) =>
+              Provider.of<AuthProvider>(context, listen: false).getUsersData(),
+          initialData: null,
+          child: const UserList(),
+        ));
   }
+}
+
+class UserList extends StatelessWidget {
+  const UserList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Center(
-            child: InkWell(
-                onTap: () {
-                  final provider =
-                      Provider.of<AuthProvider>(context, listen: false);
-                  provider.logOut();
-                  Navigator.pushReplacementNamed(
-                    context,
-                    AppRoutes.login,
-                  );
-                },
-                child: Container(
-                    color: Colors.red, height: 70, child: Text("LogOut"))),
-          ),
-          Consumer<AuthProvider>(builder: (_, data, child) {
-            return ListView.builder(
+    List<Users>? userList = Provider.of<List<Users>?>(context);
+    var provider = Provider.of<AuthProvider>(context, listen: false);
+    return userList == null
+        ? const Center(child: CircularProgressIndicator())
+        : userList.isEmpty
+            ? const Center(child: Text("Users Not Found"))
+            : ListView.builder(
                 shrinkWrap: true,
-                itemCount: data.userList.length,
-                itemBuilder: (context, index) {
-                  var userData = data.userList[index];
-                  return ListTile(
-                    title: Text(userData.name.toString()),
+                itemCount: userList.length,
+                itemBuilder: (_, int index) {
+                  var users = userList[index];
+                  return
+                      //  provider.currentUserId == users.uid
+                      //     ? Container()
+                      //     :
+                      ListTile(
+                    leading: Icon(provider.currentUserId == users.uid
+                        ? Icons.account_circle
+                        : Icons.account_circle_outlined),
+                    title: Text(provider.currentUserId == users.uid
+                        ? "You"
+                        : users.name.toString()),
+                    subtitle: Text(users.email.toString()),
+                    onTap: () {
+                      if (provider.currentUserId == users.uid) {
+                        buildShowSnackBar(
+                            context, "You can't send message to yourself");
+                      } else {
+                        provider.usersClickListener(users, context);
+                      }
+                    },
                   );
                 });
-          })
-        ],
-      ),
-    );
   }
 }

@@ -208,13 +208,13 @@ class _LogIn extends State<LogIn> {
   void _onLogInButtonPressed(String email, String password) async {
     final provider = Provider.of<AuthProvider>(context, listen: false);
 
-    bool check = await provider.logIn(email, password);
-
-    if (check == true) {
-      Navigator.pushReplacementNamed(
-        context,
-        AppRoutes.home,
-      );
-    }
+    provider.logIn(email, password).then((result) {
+      if (result) {
+        Navigator.pushReplacementNamed(
+          context,
+          AppRoutes.home,
+        );
+      }
+    });
   }
 }

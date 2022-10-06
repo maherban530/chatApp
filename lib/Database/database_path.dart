@@ -1,5 +1,7 @@
 class DatabasePath {
   static const userCollection = "users";
+  static const messages = "messages";
+
   // static const userConnections = "connections";
   // static const userReceiveRequest = "receive-request";
   // static const userSentRequest = "sent-request";
@@ -9,7 +11,6 @@ class DatabasePath {
   // static const solidColorWallpaper = "solid-color";
   // static const wallpaperPictureCollection = "pictures";
   // static const data = "data";
-  // static const messages = "messages";
   // static const activities = "activities";
   // static const contents = "contents";
   // static const status = "status";

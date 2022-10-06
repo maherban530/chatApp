@@ -262,16 +262,18 @@ class _SignUp extends State<SignUp> {
       name: firstName,
       password: password,
       phoneNumber: phone,
+      userStatus: 'Online',
       uid: '',
     );
 
     final provider = Provider.of<AuthProvider>(context, listen: false);
-    bool check = await provider.signUp(userModel, context);
-    if (check == true) {
-      Navigator.pushReplacementNamed(
-        context,
-        AppRoutes.home,
-      );
-    }
+    provider.signUp(userModel).then((result) {
+      if (result) {
+        Navigator.pushReplacementNamed(
+          context,
+          AppRoutes.home,
+        );
+      }
+    });
   }
 }
