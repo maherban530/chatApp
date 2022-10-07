@@ -3,7 +3,7 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import '../audio_file.dart';
+import 'audio_file.dart';
 
 class SenderMessageCard extends StatefulWidget {
   const SenderMessageCard(this.fileName, this.msgType, this.msg, this.time,
@@ -138,7 +138,7 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
 
   Future<void> initializePlayer(videoUrl) async {
     _videoPlayerController = VideoPlayerController.network(videoUrl);
-    await Future.wait([
+    Future.wait([
       _videoPlayerController.initialize(),
     ]);
     _createChewieController();

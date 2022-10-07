@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import '../Core/route_path.dart';
 import '../Database/database_path.dart';
+import '../Models/last_message_model.dart';
 import '../Models/messages_model.dart';
 import '../Models/user_model.dart';
 
@@ -69,8 +70,34 @@ class AuthProvider extends ChangeNotifier {
     // notifyListeners();
   }
 
-  Stream<List<MessagesModel>> getMessages(BuildContext context,
-      {required String chatId}) {
+  Stream<Users> getLastSeenChat() {
+    return _firebaseStore
+        .collection(DatabasePath.userCollection)
+        .where('uid', isEqualTo: peerUserData!.uid)
+        .snapshots()
+        .map((snapShot) => Users.fromJson(snapShot.docs[0].data()));
+    //     .then((QuerySnapshot value) {
+    //   peerUserData =
+    //       Users.fromJson(value.docs[0].data() as Map<String, dynamic>);
+    // });
+  }
+
+  Stream<LastMessageModel> getLastMessage({required String chatId}) {
+    return _firebaseStore
+        .collection(DatabasePath.userCollection)
+        .doc(currentUserId)
+        .collection(DatabasePath.messages)
+        .where('chatId', isEqualTo: chatId)
+        .snapshots()
+        .map((snapShot) => LastMessageModel.fromJson(snapShot.docs[0].data()));
+
+    //     .then((QuerySnapshot value) {
+    //   peerUserData =
+    //       Users.fromJson(value.docs[0].data() as Map<String, dynamic>);
+    // });
+  }
+
+  Stream<List<MessagesModel>> getMessages({required String chatId}) {
     return FirebaseFirestore.instance
         .collection(DatabasePath.userCollection)
         .doc(currentUserId)
@@ -113,14 +140,12 @@ class AuthProvider extends ChangeNotifier {
     Reference ref = storage
         .ref()
         .child("Media")
-        // ignore: use_build_context_synchronously
         .child(getChatId(context))
-        // ignore: unrelated_type_equality_checks
         .child(file is File
             ? voiceMessageName
             : file.runtimeType == FilePickerResult
-                ? file!.files.single.name
-                : file!.name);
+                ? file.files.single.name
+                : file.name);
     return ref.putFile(file is File
         ? file
         : File(file.runtimeType == FilePickerResult
@@ -136,6 +161,7 @@ class AuthProvider extends ChangeNotifier {
       required msgType,
       required message,
       required fileName}) {
+    ///current user
     _firebaseStore
         .collection(DatabasePath.userCollection)
         .doc(currentUserId)
@@ -153,7 +179,25 @@ class AuthProvider extends ChangeNotifier {
       'fileName': fileName,
     });
 
-    ////last message
+    ///peer user
+    _firebaseStore
+        .collection(DatabasePath.userCollection)
+        .doc(peerUserData!.uid)
+        .collection(DatabasePath.messages)
+        .doc(chatId)
+        .collection(chatId)
+        .doc("${Timestamp.now().millisecondsSinceEpoch}")
+        .set({
+      'chatId': chatId,
+      'senderId': senderId,
+      'receiverId': receiverId,
+      'msgTime': msgTime,
+      'msgType': msgType,
+      'message': message,
+      'fileName': fileName,
+    });
+
+    ////last message create current user
     _firebaseStore
         .collection(DatabasePath.userCollection)
         .doc(currentUserId)
@@ -163,6 +207,7 @@ class AuthProvider extends ChangeNotifier {
         .get()
         .then((QuerySnapshot value) {
       if (value.size == 1) {
+        ///current user
         _firebaseStore
             .collection(DatabasePath.userCollection)
             .doc(currentUserId)
@@ -177,10 +222,44 @@ class AuthProvider extends ChangeNotifier {
           'lastMessage': message,
           'lastFileName': fileName,
         });
+
+        ///peer user
+        _firebaseStore
+            .collection(DatabasePath.userCollection)
+            .doc(peerUserData!.uid)
+            .collection(DatabasePath.messages)
+            .doc(chatId)
+            .set({
+          'chatId': chatId,
+          'lastSenderId': senderId,
+          'lastReceiverId': receiverId,
+          'lastMsgTime': msgTime,
+          'lastMsgType': msgType,
+          'lastMessage': message,
+          'lastFileName': fileName,
+        });
       }
+
+      ////last message update current user
       _firebaseStore
           .collection(DatabasePath.userCollection)
           .doc(currentUserId)
+          .collection(DatabasePath.messages)
+          .doc(chatId)
+          .update({
+        'chatId': chatId,
+        'lastSenderId': senderId,
+        'lastReceiverId': receiverId,
+        'lastMsgTime': msgTime,
+        'lastMsgType': msgType,
+        'lastMessage': message,
+        'lastFileName': fileName,
+      });
+
+      ////last message update peer user
+      _firebaseStore
+          .collection(DatabasePath.userCollection)
+          .doc(peerUserData!.uid)
           .collection(DatabasePath.messages)
           .doc(chatId)
           .update({
@@ -314,8 +393,9 @@ class AuthProvider extends ChangeNotifier {
   // }
 
   String getChatId(BuildContext context) {
-    return currentUserId.hashCode <= peerUserData!.uid.hashCode
-        ? "$currentUserId - ${peerUserData!.uid}"
-        : "${peerUserData!.uid} - $currentUserId";
+    return "${peerUserData!.uid} - $currentUserId";
+    // currentUserId.hashCode <= peerUserData!.uid.hashCode
+    //     ? "$currentUserId - ${peerUserData!.uid}"
+    //     :
   }
 }

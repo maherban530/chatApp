@@ -145,6 +145,8 @@ class _MessagesComposeState extends State<MessagesCompose>
                         hintStyle: const TextStyle(
                           color: Colors.white,
                         ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 16),
                         suffixIcon: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -215,7 +217,6 @@ class _MessagesComposeState extends State<MessagesCompose>
                                 ))
                           ],
                         ),
-                        contentPadding: const EdgeInsets.all(5),
                       )),
                 )),
         Padding(

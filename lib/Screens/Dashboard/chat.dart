@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../Widgets/last_seen_chat.dart';
 import '../../Widgets/message_compose.dart';
 import '../../Widgets/messages.dart';
 
@@ -63,7 +64,10 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData applicationTheme = Theme.of(context);
+
     return Scaffold(
+        backgroundColor: applicationTheme.backgroundColor,
         appBar: AppBar(
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +79,7 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                       .toString(),
                   style: const TextStyle(
                       fontSize: 18.5, fontWeight: FontWeight.bold)),
-              //  const SubTitleAppBar(),
+              const LastSeenChat(),
             ],
           ),
           actions: [

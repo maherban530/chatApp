@@ -33,7 +33,7 @@ class _MessagesState extends State<Messages> {
   Widget build(BuildContext context) {
     return StreamProvider(
       create: (BuildContext context) =>
-          Provider.of<AuthProvider>(context, listen: false).getMessages(context,
+          Provider.of<AuthProvider>(context, listen: false).getMessages(
               chatId: Provider.of<AuthProvider>(context, listen: false)
                   .getChatId(context)),
       initialData: null,
