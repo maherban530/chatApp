@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +27,7 @@ class AuthProvider extends ChangeNotifier {
           email: users.email!, password: users.password!);
       // userCredential.user?.sendEmailVerification();
       users.uid = currentUserId;
+      users.fcmToken = await FirebaseMessaging.instance.getToken() ?? "";
       await _firebaseStore
           .doc('${DatabasePath.userCollection}/$currentUserId')
           .set(users.toJson(), SetOptions(merge: true));
@@ -82,25 +84,21 @@ class AuthProvider extends ChangeNotifier {
     // });
   }
 
-  Stream<LastMessageModel> getLastMessage({required String chatId}) {
-    return _firebaseStore
-        .collection(DatabasePath.userCollection)
-        .doc(currentUserId)
-        .collection(DatabasePath.messages)
-        .where('chatId', isEqualTo: chatId)
-        .snapshots()
-        .map((snapShot) => LastMessageModel.fromJson(snapShot.docs[0].data()));
+  // Stream<LastMessageModel> getLastMessage({required String chatId}) {
+  //   return _firebaseStore
+  //       .collection(DatabasePath.messages)
+  //       .where('chatId', isEqualTo: chatId)
+  //       .snapshots()
+  //       .map((snapShot) => LastMessageModel.fromJson(snapShot.docs[0].data()));
 
-    //     .then((QuerySnapshot value) {
-    //   peerUserData =
-    //       Users.fromJson(value.docs[0].data() as Map<String, dynamic>);
-    // });
-  }
+  //   //     .then((QuerySnapshot value) {
+  //   //   peerUserData =
+  //   //       Users.fromJson(value.docs[0].data() as Map<String, dynamic>);
+  //   // });
+  // }
 
   Stream<List<MessagesModel>> getMessages({required String chatId}) {
     return FirebaseFirestore.instance
-        .collection(DatabasePath.userCollection)
-        .doc(currentUserId)
         .collection(DatabasePath.messages)
         .doc(chatId)
         .collection(chatId)
@@ -163,8 +161,6 @@ class AuthProvider extends ChangeNotifier {
       required fileName}) {
     ///current user
     _firebaseStore
-        .collection(DatabasePath.userCollection)
-        .doc(currentUserId)
         .collection(DatabasePath.messages)
         .doc(chatId)
         .collection(chatId)
@@ -179,102 +175,201 @@ class AuthProvider extends ChangeNotifier {
       'fileName': fileName,
     });
 
-    ///peer user
-    _firebaseStore
-        .collection(DatabasePath.userCollection)
-        .doc(peerUserData!.uid)
-        .collection(DatabasePath.messages)
-        .doc(chatId)
-        .collection(chatId)
-        .doc("${Timestamp.now().millisecondsSinceEpoch}")
-        .set({
-      'chatId': chatId,
-      'senderId': senderId,
-      'receiverId': receiverId,
-      'msgTime': msgTime,
-      'msgType': msgType,
-      'message': message,
-      'fileName': fileName,
-    });
+    // ////last message create current user
+    // _firebaseStore
+    //     .collection(DatabasePath.userCollection)
+    //     .doc(currentUserId)
+    //     .collection(DatabasePath.messages)
+    //     .doc(chatId)
+    //     .collection(chatId)
+    //     .get()
+    //     .then((QuerySnapshot value) {
+    //   if (value.size == 1) {
+    //     ///current user
+    //     _firebaseStore
+    //         .collection(DatabasePath.userCollection)
+    //         .doc(currentUserId)
+    //         .collection(DatabasePath.messages)
+    //         .doc(chatId)
+    //         .set({
+    //       'chatId': chatId,
+    //       'lastSenderId': senderId,
+    //       'lastReceiverId': receiverId,
+    //       'lastMsgTime': msgTime,
+    //       'lastMsgType': msgType,
+    //       'lastMessage': message,
+    //       'lastFileName': fileName,
+    //     });
 
-    ////last message create current user
-    _firebaseStore
-        .collection(DatabasePath.userCollection)
-        .doc(currentUserId)
-        .collection(DatabasePath.messages)
-        .doc(chatId)
-        .collection(chatId)
-        .get()
-        .then((QuerySnapshot value) {
-      if (value.size == 1) {
-        ///current user
-        _firebaseStore
-            .collection(DatabasePath.userCollection)
-            .doc(currentUserId)
-            .collection(DatabasePath.messages)
-            .doc(chatId)
-            .set({
-          'chatId': chatId,
-          'lastSenderId': senderId,
-          'lastReceiverId': receiverId,
-          'lastMsgTime': msgTime,
-          'lastMsgType': msgType,
-          'lastMessage': message,
-          'lastFileName': fileName,
-        });
+    //     ///peer user
+    //     _firebaseStore
+    //         .collection(DatabasePath.userCollection)
+    //         .doc(peerUserData!.uid)
+    //         .collection(DatabasePath.messages)
+    //         .doc(chatId)
+    //         .set({
+    //       'chatId': chatId,
+    //       'lastSenderId': senderId,
+    //       'lastReceiverId': receiverId,
+    //       'lastMsgTime': msgTime,
+    //       'lastMsgType': msgType,
+    //       'lastMessage': message,
+    //       'lastFileName': fileName,
+    //     });
+    //   }
 
-        ///peer user
-        _firebaseStore
-            .collection(DatabasePath.userCollection)
-            .doc(peerUserData!.uid)
-            .collection(DatabasePath.messages)
-            .doc(chatId)
-            .set({
-          'chatId': chatId,
-          'lastSenderId': senderId,
-          'lastReceiverId': receiverId,
-          'lastMsgTime': msgTime,
-          'lastMsgType': msgType,
-          'lastMessage': message,
-          'lastFileName': fileName,
-        });
-      }
+    //   ////last message update current user
+    //   _firebaseStore
+    //       .collection(DatabasePath.userCollection)
+    //       .doc(currentUserId)
+    //       .collection(DatabasePath.messages)
+    //       .doc(chatId)
+    //       .update({
+    //     'chatId': chatId,
+    //     'lastSenderId': senderId,
+    //     'lastReceiverId': receiverId,
+    //     'lastMsgTime': msgTime,
+    //     'lastMsgType': msgType,
+    //     'lastMessage': message,
+    //     'lastFileName': fileName,
+    //   });
 
-      ////last message update current user
-      _firebaseStore
-          .collection(DatabasePath.userCollection)
-          .doc(currentUserId)
-          .collection(DatabasePath.messages)
-          .doc(chatId)
-          .update({
-        'chatId': chatId,
-        'lastSenderId': senderId,
-        'lastReceiverId': receiverId,
-        'lastMsgTime': msgTime,
-        'lastMsgType': msgType,
-        'lastMessage': message,
-        'lastFileName': fileName,
-      });
-
-      ////last message update peer user
-      _firebaseStore
-          .collection(DatabasePath.userCollection)
-          .doc(peerUserData!.uid)
-          .collection(DatabasePath.messages)
-          .doc(chatId)
-          .update({
-        'chatId': chatId,
-        'lastSenderId': senderId,
-        'lastReceiverId': receiverId,
-        'lastMsgTime': msgTime,
-        'lastMsgType': msgType,
-        'lastMessage': message,
-        'lastFileName': fileName,
-      });
-    });
+    //   ////last message update peer user
+    //   _firebaseStore
+    //       .collection(DatabasePath.userCollection)
+    //       .doc(peerUserData!.uid)
+    //       .collection(DatabasePath.messages)
+    //       .doc(chatId)
+    //       .update({
+    //     'chatId': chatId,
+    //     'lastSenderId': senderId,
+    //     'lastReceiverId': receiverId,
+    //     'lastMsgTime': msgTime,
+    //     'lastMsgType': msgType,
+    //     'lastMessage': message,
+    //     'lastFileName': fileName,
+    //   });
+    // });
 
     ///
   }
+
+  //////////////////////////////
+  // update last message
+  // void updateLastMessage(
+  //     {required chatId,
+  //     required senderId,
+  //     required receiverId,
+  //     required receiverUsername,
+  //     required msgTime,
+  //     required msgType,
+  //     required message,
+  //     required context}) {
+  //   lastMessageForPeerUser(receiverId, senderId, chatId, context,
+  //       receiverUsername, msgTime, msgType, message);
+  //   lastMessageForCurrentUser(receiverId, senderId, chatId, context,
+  //       receiverUsername, msgTime, msgType, message);
+  // }
+
+  // void lastMessageForCurrentUser(receiverId, senderId, chatId, context,
+  //     receiverUsername, msgTime, msgType, message) {
+  //   FirebaseFirestore.instance
+  //       .collection("lastMessages")
+  //       .doc(senderId)
+  //       .collection(senderId)
+  //       .where('chatId', isEqualTo: chatId)
+  //       .get()
+  //       .then((QuerySnapshot value) {
+  //     if (value.size == 0) {
+  //       FirebaseFirestore.instance
+  //           .collection("lastMessages")
+  //           .doc(senderId)
+  //           .collection(senderId)
+  //           .doc("${Timestamp.now().millisecondsSinceEpoch}")
+  //           .set({
+  //         'chatId': chatId,
+  //         'messageFrom': FirebaseAuth.instance.currentUser!.displayName,
+  //         'messageTo': receiverUsername,
+  //         'messageSenderId': senderId,
+  //         'messageReceiverId': receiverId,
+  //         'msgTime': msgTime,
+  //         'msgType': msgType,
+  //         'message': message,
+  //       });
+  //     } else {
+  //       FirebaseFirestore.instance
+  //           .collection("lastMessages")
+  //           .doc(senderId)
+  //           .collection(senderId)
+  //           .doc(value.docs[0].id)
+  //           .update({
+  //         'messageFrom': FirebaseAuth.instance.currentUser!.displayName,
+  //         'messageTo': receiverUsername,
+  //         'messageSenderId': senderId,
+  //         'messageReceiverId': receiverId,
+  //         'msgTime': msgTime,
+  //         'msgType': msgType,
+  //         'message': message,
+  //       });
+  //     }
+  //   });
+  // }
+
+  // void lastMessageForPeerUser(receiverId, senderId, chatId, context,
+  //     receiverUsername, msgTime, msgType, message) {
+  //   FirebaseFirestore.instance
+  //       .collection("lastMessages")
+  //       .doc(receiverId)
+  //       .collection(receiverId)
+  //       .where('chatId', isEqualTo: chatId)
+  //       .get()
+  //       .then((QuerySnapshot value) {
+  //     if (value.size == 0) {
+  //       FirebaseFirestore.instance
+  //           .collection("lastMessages")
+  //           .doc(receiverId)
+  //           .collection(receiverId)
+  //           .doc("${Timestamp.now().millisecondsSinceEpoch}")
+  //           .set({
+  //         'chatId': chatId,
+  //         'messageFrom': FirebaseAuth.instance.currentUser!.displayName,
+  //         'messageTo': receiverUsername,
+  //         'messageSenderId': senderId,
+  //         'messageReceiverId': receiverId,
+  //         'msgTime': msgTime,
+  //         'msgType': msgType,
+  //         'message': message,
+  //       });
+  //     } else {
+  //       FirebaseFirestore.instance
+  //           .collection("lastMessages")
+  //           .doc(receiverId)
+  //           .collection(receiverId)
+  //           .doc(value.docs[0].id)
+  //           .update({
+  //         'messageFrom': FirebaseAuth.instance.currentUser!.displayName,
+  //         'messageTo': receiverUsername,
+  //         'messageSenderId': senderId,
+  //         'messageReceiverId': receiverId,
+  //         'msgTime': msgTime,
+  //         'msgType': msgType,
+  //         'message': message,
+  //       });
+  //     }
+  //   });
+  // }
+/////////////////////////////
+  // get all last messages
+  // Stream<QuerySnapshot<Map<String, dynamic>>> getLastMessages(
+  //     BuildContext context, String myId) {
+  //   return FirebaseFirestore.instance
+  //       .collection('lastMessages')
+  //       .doc(myId)
+  //       .collection(myId)
+  //       .orderBy("msgTime", descending: true)
+  //       .snapshots();
+  // }
+/////////////////////////////
 
   // update last message
   // void updateLastMessage(
@@ -393,9 +488,18 @@ class AuthProvider extends ChangeNotifier {
   // }
 
   String getChatId(BuildContext context) {
-    return "${peerUserData!.uid} - $currentUserId";
-    // currentUserId.hashCode <= peerUserData!.uid.hashCode
-    //     ? "$currentUserId - ${peerUserData!.uid}"
-    //     :
+    if (currentUserId.hashCode <= peerUserData!.uid.hashCode) {
+      return "$currentUserId - ${peerUserData!.uid}";
+    } else {
+      return "${peerUserData!.uid} - $currentUserId";
+    }
+  }
+
+  String getLastMessageChatId(String? peerUserId) {
+    if (currentUserId.hashCode <= peerUserId.hashCode) {
+      return "$currentUserId - $peerUserId";
+    } else {
+      return "$peerUserId - $currentUserId";
+    }
   }
 }

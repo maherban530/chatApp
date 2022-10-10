@@ -13,6 +13,7 @@ import 'package:mime/mime.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
+import '../Notifications/notification.dart';
 import '../Provider/auth_provider.dart';
 // import '../provider/my_provider.dart';
 // import '../firebase_helper/fireBaseHelper.dart';
@@ -155,38 +156,44 @@ class _MessagesComposeState extends State<MessagesCompose>
                                   final status =
                                       await Permission.storage.request();
                                   if (status == PermissionStatus.granted) {
-                                    FilePickerResult? result =
-                                        await FilePicker.platform.pickFiles();
-                                    UploadTask uploadTask =
-                                        provider.getRefrenceFromStorage(
-                                            result, "", context);
-                                    if (lookupMimeType(result!.files.single.path
-                                            .toString())!
-                                        .contains("video")) {
-                                      uploadFile(
-                                          "", "video", uploadTask, context);
-                                    } else if (lookupMimeType(result
-                                            .files.single.path
-                                            .toString())!
-                                        .contains("application")) {
-                                      uploadFile(result.files.single.name,
-                                          "document", uploadTask, context);
-                                    } else if (lookupMimeType(result
-                                            .files.single.path
-                                            .toString())!
-                                        .contains("image")) {
-                                      uploadFile(
-                                          "", "image", uploadTask, context);
-                                    } else if (lookupMimeType(result
-                                            .files.single.path
-                                            .toString())!
-                                        .contains("audio")) {
-                                      uploadFile(result.files.single.name,
-                                          "audio", uploadTask, context);
-                                    } else {
-                                      buildShowSnackBar(
-                                          context, "unsupported format");
-                                    }
+                                    // FilePickerResult? result =
+                                    await FilePicker.platform
+                                        .pickFiles()
+                                        .then((result) {
+                                      if (result != null) {
+                                        UploadTask uploadTask =
+                                            provider.getRefrenceFromStorage(
+                                                result, "", context);
+                                        if (lookupMimeType(result
+                                                .files.single.path
+                                                .toString())!
+                                            .contains("video")) {
+                                          uploadFile(
+                                              "", "video", uploadTask, context);
+                                        } else if (lookupMimeType(result
+                                                .files.single.path
+                                                .toString())!
+                                            .contains("application")) {
+                                          uploadFile(result.files.single.name,
+                                              "document", uploadTask, context);
+                                        } else if (lookupMimeType(result
+                                                .files.single.path
+                                                .toString())!
+                                            .contains("image")) {
+                                          uploadFile(
+                                              "", "image", uploadTask, context);
+                                        } else if (lookupMimeType(result
+                                                .files.single.path
+                                                .toString())!
+                                            .contains("audio")) {
+                                          uploadFile(result.files.single.name,
+                                              "audio", uploadTask, context);
+                                        } else {
+                                          buildShowSnackBar(
+                                              context, "unsupported format");
+                                        }
+                                      }
+                                    });
                                   } else {
                                     await Permission.storage.request();
                                   }
@@ -197,19 +204,25 @@ class _MessagesComposeState extends State<MessagesCompose>
                                 )),
                             IconButton(
                                 onPressed: () async {
-                                  final status =
+                                  await Permission.storage
+                                      .request()
+                                      .then((status) async {
+                                    if (status == PermissionStatus.granted) {
+                                      await _picker
+                                          .pickImage(source: ImageSource.camera)
+                                          .then((photo) {
+                                        if (photo != null) {
+                                          UploadTask uploadTask =
+                                              provider.getRefrenceFromStorage(
+                                                  photo, "", context);
+                                          uploadFile(
+                                              "", "image", uploadTask, context);
+                                        } else {}
+                                      });
+                                    } else {
                                       await Permission.storage.request();
-                                  if (status == PermissionStatus.granted) {
-                                    final XFile? photo = await _picker
-                                        .pickImage(source: ImageSource.camera);
-                                    UploadTask uploadTask =
-                                        provider.getRefrenceFromStorage(
-                                            photo, "", context);
-                                    uploadFile(
-                                        "", "image", uploadTask, context);
-                                  } else {
-                                    await Permission.storage.request();
-                                  }
+                                    }
+                                  });
                                 },
                                 icon: const Icon(
                                   Icons.camera,
@@ -247,6 +260,18 @@ class _MessagesComposeState extends State<MessagesCompose>
                     //     message: _textController.text.toString(),
                     //     context: context);
 
+                    /////////////////////////////
+
+                    // provider.updateLastMessage(
+                    //     chatId: provider.getChatId(context),
+                    //     senderId: provider.currentUserId,
+                    //     receiverId: provider.peerUserData!.uid,
+                    //     receiverUsername: provider.peerUserData!.name,
+                    //     msgTime: FieldValue.serverTimestamp(),
+                    //     msgType: "text",
+                    //     message: _textController.text.toString(),
+                    //     context: context);
+
                     // notifyUser(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.displayName,
                     //     _textController.text.toString(),
                     //     Provider.of<MyProvider>(context,listen: false).peerUserData!["email"],
@@ -257,24 +282,27 @@ class _MessagesComposeState extends State<MessagesCompose>
                     });
                     provider.updateUserStatus("Online");
                   } else {
-                    final status = await Permission.microphone.request();
-                    if (status == PermissionStatus.granted) {
-                      await initRecording();
-                      if (recorder.isRecording) {
-                        await stop();
-                        setState(() {
-                          startVoiceMessage = false;
-                        });
+                    // final status =
+                    await Permission.microphone.request().then((status) async {
+                      if (status == PermissionStatus.granted) {
+                        await initRecording();
+                        if (recorder.isRecording) {
+                          await stop();
+                          setState(() {
+                            startVoiceMessage = false;
+                          });
+                        } else {
+                          await record();
+                          setState(() {
+                            startVoiceMessage = true;
+                          });
+                        }
                       } else {
-                        await record();
-                        setState(() {
-                          startVoiceMessage = true;
-                        });
+                        buildShowSnackBar(
+                            context, "You must enable record permission");
                       }
-                    } else {
-                      buildShowSnackBar(
-                          context, "You must enable record permission");
-                    }
+                    });
+
                     // voice message
 
                   }
@@ -302,13 +330,12 @@ class _MessagesComposeState extends State<MessagesCompose>
   void uploadFile(String fileName, String fileType, UploadTask uploadTask,
       BuildContext context) {
     uploadTask.snapshotEvents.listen((event) {
-      // uploadingNotification(
-      //     fileType,
-      //     Provider.of<MyProvider>(context,listen: false).peerUserData!["name"],
-      //     event.totalBytes,
-      //     event.bytesTransferred,
-      //     true
-      // );
+      uploadingNotification(
+          fileType,
+          Provider.of<AuthProvider>(context, listen: false).peerUserData!.name,
+          event.totalBytes,
+          event.bytesTransferred,
+          true);
     });
     uploadTask.whenComplete(() => {
           // uploadingNotification(
@@ -373,11 +400,12 @@ class _MessagesComposeState extends State<MessagesCompose>
   Future stop() async {
     String voiceMessageName = "${DateTime.now().toString()}.mp4";
     if (!isRecorderReady) return;
-    final path = await recorder.stopRecorder();
-    final audioFile = File(path!);
-    UploadTask uploadTask = Provider.of<AuthProvider>(context, listen: false)
-        .getRefrenceFromStorage(audioFile, voiceMessageName, context);
-    uploadFile(voiceMessageName, "voice message", uploadTask, context);
+    await recorder.stopRecorder().then((path) {
+      final audioFile = File(path!);
+      UploadTask uploadTask = Provider.of<AuthProvider>(context, listen: false)
+          .getRefrenceFromStorage(audioFile, voiceMessageName, context);
+      uploadFile(voiceMessageName, "voice message", uploadTask, context);
+    });
   }
 
   void cancelRecord() {

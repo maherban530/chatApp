@@ -4,6 +4,7 @@ class Users {
   int? phoneNumber;
   String? email;
   String? password;
+  String? fcmToken;
   dynamic userStatus;
 
   Users(
@@ -12,6 +13,7 @@ class Users {
       this.phoneNumber,
       this.email,
       this.password,
+      this.fcmToken,
       this.userStatus});
 
   Users.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Users {
     phoneNumber = json['phoneNumber'];
     email = json['email'];
     password = json['password'];
+    fcmToken = json['fcmToken'];
     userStatus = json['userStatus'];
   }
 
@@ -30,6 +33,7 @@ class Users {
     data['phoneNumber'] = phoneNumber;
     data['email'] = email;
     data['password'] = password;
+    data['fcmToken'] = fcmToken;
     data['userStatus'] = userStatus;
     return data;
   }

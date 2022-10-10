@@ -43,7 +43,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <!-- <provider
+        <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"
             android:exported="false"
@@ -53,7 +53,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths"
                 tools:replace="android:resource" />
-        </provider> -->
+        </provider>
         
         
     </application>

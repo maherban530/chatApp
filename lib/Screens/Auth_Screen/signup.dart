@@ -130,10 +130,18 @@ class _SignUp extends State<SignUp> {
                             //   },
                             // ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   )),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.login,
+                    );
+                  },
+                  child: const Text('LogIn')),
             ],
           ),
         ),
@@ -263,6 +271,7 @@ class _SignUp extends State<SignUp> {
       password: password,
       phoneNumber: phone,
       userStatus: 'Online',
+      fcmToken: '',
       uid: '',
     );
 

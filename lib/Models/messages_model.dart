@@ -20,13 +20,13 @@ class MessagesModel {
   });
 
   MessagesModel.fromJson(Map<String, dynamic> json) {
-    chatId = json['chatId'];
-    senderId = json['senderId'];
-    receiverId = json['receiverId'];
-    msgTime = json['msgTime'];
-    msgType = json['msgType'];
-    message = json['message'];
-    fileName = json['fileName'];
+    chatId = json['chatId'] ?? '';
+    senderId = json['senderId'] ?? '';
+    receiverId = json['receiverId'] ?? '';
+    msgTime = json['msgTime'] ?? '';
+    msgType = json['msgType'] ?? '';
+    message = json['message'] ?? '';
+    fileName = json['fileName'] ?? '';
   }
 
   Map<String, dynamic> toJson() {

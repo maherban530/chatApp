@@ -74,7 +74,7 @@ class _LogIn extends State<LogIn> {
                                 //         fit: BoxFit.fill)),
                                 child: Center(
                                   child: Text(
-                                    ApplicationTexts.signUpButtonName,
+                                    ApplicationTexts.logInButtonName,
                                     textAlign: TextAlign.center,
                                     style: applicationTheme.textTheme.bodyText1!
                                         .copyWith(
@@ -126,6 +126,14 @@ class _LogIn extends State<LogIn> {
                       ],
                     ),
                   )),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.signup,
+                    );
+                  },
+                  child: const Text('SignUp'))
             ],
           ),
         ),

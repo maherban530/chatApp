@@ -20,7 +20,7 @@ class SenderMessageCard extends StatefulWidget {
 }
 
 class _SenderMessageCardState extends State<SenderMessageCard> {
-  late VideoPlayerController _videoPlayerController;
+  VideoPlayerController? _videoPlayerController;
   ChewieController? _chewieController;
   int? bufferDelay;
   Widget messageBuilder(context) {
@@ -130,7 +130,7 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
+    _videoPlayerController!.dispose();
     _chewieController?.dispose();
 
     super.dispose();
@@ -139,7 +139,7 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
   Future<void> initializePlayer(videoUrl) async {
     _videoPlayerController = VideoPlayerController.network(videoUrl);
     Future.wait([
-      _videoPlayerController.initialize(),
+      _videoPlayerController!.initialize(),
     ]);
     _createChewieController();
     setState(() {});
@@ -147,7 +147,7 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
 
   void _createChewieController() {
     _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
+      videoPlayerController: _videoPlayerController!,
       autoPlay: false,
       looping: true,
       progressIndicatorDelay:

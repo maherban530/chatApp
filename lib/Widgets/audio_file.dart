@@ -175,7 +175,7 @@ class _VoiceMessageState extends State<VoiceMessage> {
           children: [
             Padding(
               padding: EdgeInsets.only(
-                  right: MediaQuery.of(context).size.width * .3, left: 20),
+                  right: MediaQuery.of(context).size.width * .3, left: 14),
               child: Text(_position.toString().split(".")[0],
                   style: const TextStyle(color: Colors.white)),
             ),

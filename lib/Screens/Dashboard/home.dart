@@ -85,11 +85,14 @@ class UserList extends StatelessWidget {
                               //   :
                               users.name.toString()),
                           subtitle: StreamProvider(
-                            create: (BuildContext context) => Provider.of<
-                                    AuthProvider>(context, listen: false)
-                                .getLastMessage(
-                                    chatId:
-                                        '${users.uid} - ${Provider.of<AuthProvider>(context, listen: false).currentUserId}'),
+                            create: (BuildContext context) =>
+                                Provider.of<AuthProvider>(context,
+                                        listen: false)
+                                    .getMessages(
+                                        chatId: Provider.of<AuthProvider>(
+                                                context,
+                                                listen: false)
+                                            .getLastMessageChatId(users.uid)),
                             initialData: null,
                             child: const LastMessageWidget(),
                           ),
