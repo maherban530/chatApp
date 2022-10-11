@@ -20,6 +20,7 @@ class AuthProvider extends ChangeNotifier {
 
   Users? peerUserData;
   List<Users> userList = [];
+  // bool startVoiceMessage = false;
 
   Future signUp(Users users) async {
     try {
@@ -97,7 +98,7 @@ class AuthProvider extends ChangeNotifier {
   //   // });
   // }
 
-  Stream<List<MessagesModel>> getMessages({required String chatId}) {
+  Stream<Iterable<MessagesModel>> getMessages({required String chatId}) {
     return FirebaseFirestore.instance
         .collection(DatabasePath.messages)
         .doc(chatId)
@@ -105,8 +106,7 @@ class AuthProvider extends ChangeNotifier {
         .orderBy("msgTime", descending: true)
         .snapshots()
         .map((snapShot) => snapShot.docs
-            .map((document) => MessagesModel.fromJson(document.data()))
-            .toList());
+            .map((document) => MessagesModel.fromJson(document.data())));
   }
 
   void usersClickListener(Users snapshot, BuildContext context) {

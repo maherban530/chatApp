@@ -23,7 +23,7 @@ class MessagesModel {
     chatId = json['chatId'] ?? '';
     senderId = json['senderId'] ?? '';
     receiverId = json['receiverId'] ?? '';
-    msgTime = json['msgTime'] ?? '';
+    msgTime = json['msgTime'];
     msgType = json['msgType'] ?? '';
     message = json['message'] ?? '';
     fileName = json['fileName'] ?? '';

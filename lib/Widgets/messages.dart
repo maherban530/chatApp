@@ -21,17 +21,13 @@ import '../Provider/auth_provider.dart';
 // import '../provider/my_provider.dart';
 // import '../firebase_helper/fireBaseHelper.dart';
 
-class Messages extends StatefulWidget {
-  const Messages({Key? key}) : super(key: key);
+class Messages extends StatelessWidget {
+  const Messages({super.key});
 
-  @override
-  State<Messages> createState() => _MessagesState();
-}
-
-class _MessagesState extends State<Messages> {
   @override
   Widget build(BuildContext context) {
     return StreamProvider(
+      lazy: true,
       create: (BuildContext context) =>
           Provider.of<AuthProvider>(context, listen: false).getMessages(
               chatId: Provider.of<AuthProvider>(context, listen: false)
@@ -147,8 +143,8 @@ class MessageList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<MessagesModel>? messagesList =
-        Provider.of<List<MessagesModel>?>(context);
+    Iterable<MessagesModel>? messagesList =
+        Provider.of<Iterable<MessagesModel>?>(context);
     var provider = Provider.of<AuthProvider>(context, listen: false);
 
     return messagesList == null
@@ -160,7 +156,7 @@ class MessageList extends StatelessWidget {
                 shrinkWrap: true,
                 itemCount: messagesList.length,
                 itemBuilder: (context, index) {
-                  var messages = messagesList[index];
+                  var messages = messagesList.toList()[index];
                   if (provider.currentUserId == messages.senderId) {
                     return InkWell(
                       onTap: () {

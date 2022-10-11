@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'Core/route_generator.dart' as routes;
 import 'Core/route_path.dart';
 import 'Core/theme.dart';
+import 'Notifications/notification.dart';
 import 'Provider/provider_collection.dart';
 
 Future<void> main() async {
@@ -34,6 +36,10 @@ class MyApp extends StatelessWidget {
 
 _initializeFirebase() async {
   await Firebase.initializeApp();
+  notificationCallInitialization();
+  await notificationInitialization();
+  FirebaseMessaging.onBackgroundMessage(messageHandler);
+  firebaseMessagingListener();
   // await notificationInitialize();
 
   // await FirebaseMessaging.instance.setAutoInitEnabled(true);

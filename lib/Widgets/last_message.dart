@@ -10,8 +10,8 @@ class LastMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // LastMessageModel? lastMessage = Provider.of<LastMessageModel?>(context);
-    List<MessagesModel>? lastMessage =
-        Provider.of<List<MessagesModel>?>(context);
+    Iterable<MessagesModel>? lastMessage =
+        Provider.of<Iterable<MessagesModel>?>(context);
     if (lastMessage == null || lastMessage.isEmpty) {
       return Container();
     } else {

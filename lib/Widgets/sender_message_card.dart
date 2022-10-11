@@ -3,7 +3,10 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import 'audio_file.dart';
+import 'Audio Component/audio_player.dart';
+import 'package:just_audio/just_audio.dart' as ap;
+
+import 'Video Component/video_player.dart';
 
 class SenderMessageCard extends StatefulWidget {
   const SenderMessageCard(this.fileName, this.msgType, this.msg, this.time,
@@ -20,17 +23,21 @@ class SenderMessageCard extends StatefulWidget {
 }
 
 class _SenderMessageCardState extends State<SenderMessageCard> {
-  VideoPlayerController? _videoPlayerController;
-  ChewieController? _chewieController;
-  int? bufferDelay;
+  // late VideoPlayerController _videoPlayerController;
+  // ChewieController? _chewieController;
+  // int? bufferDelay;
   Widget messageBuilder(context) {
     Widget body = Container();
     if (widget.msgType == "image") {
       body = Padding(
-        padding: const EdgeInsets.only(top: 5, bottom: 5),
-        child: SizedBox(
-          width: 250,
-          height: 250,
+        padding: const EdgeInsets.all(5),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxHeight: 300,
+            // minHeight: 200,
+            maxWidth: 290,
+            // minWidth: 200
+          ),
           child: InkWell(
             onTap: () {
               showDialog(
@@ -43,16 +50,22 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
                         minScale: 0.5,
                         maxScale: 2,
                         child: FadeInImage.assetNetwork(
-                          placeholder: 'images/Fading lines.gif',
+                          placeholder: 'assets/images/Fading lines.gif',
                           image: widget.msg,
                         ),
                       ),
                     );
                   });
             },
-            child: FadeInImage.assetNetwork(
-              placeholder: 'images/Fading lines.gif',
-              image: widget.msg,
+            child: PhysicalModel(
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              color: Colors.blue,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(8),
+              child: FadeInImage.assetNetwork(
+                placeholder: 'assets/images/Fading lines.gif',
+                image: widget.msg,
+              ),
             ),
           ),
         ),
@@ -66,30 +79,51 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
         ),
       );
     } else if (widget.msgType == "video") {
-      body = SizedBox(
-        height: MediaQuery.of(context).size.height * .3,
-        width: MediaQuery.of(context).size.width * .5,
-        child: Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: _chewieController != null &&
-                        _chewieController!
-                            .videoPlayerController.value.isInitialized
-                    ? Chewie(
-                        controller: _chewieController!,
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          CircularProgressIndicator(color: Colors.black),
-                          SizedBox(height: 20),
-                          Text('Loading Video'),
-                        ],
-                      ),
-              ),
-            ],
+      body = InkWell(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return VideoViewPage(path: widget.msg);
+            },
+          );
+        },
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * .3,
+          width: MediaQuery.of(context).size.width * .5,
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+
+            child: PhysicalModel(
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              color: Colors.black54,
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(8),
+              child: const Icon(Icons.play_circle_outline_rounded,
+                  color: Colors.white, size: 100),
+            ),
+
+            //  VideoViewPage(path: widget.msg),
+            // Column(
+            //   children: <Widget>[
+            //     Expanded(
+            //       child: _chewieController != null &&
+            //               _chewieController!
+            //                   .videoPlayerController.value.isInitialized
+            //           ? Chewie(
+            //               controller: _chewieController!,
+            //             )
+            //           : Column(
+            //               mainAxisAlignment: MainAxisAlignment.center,
+            //               children: const [
+            //                 CircularProgressIndicator(color: Colors.black),
+            //                 SizedBox(height: 20),
+            //                 Text('Loading Video'),
+            //               ],
+            //             ),
+            //     ),
+            //   ],
+            // ),
           ),
         ),
       );
@@ -113,48 +147,59 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
       body = SizedBox(
         width: MediaQuery.of(context).size.width * .7,
         child: Padding(
-            padding:
-                const EdgeInsets.only(left: 10, right: 20, top: 5, bottom: 5),
-            child:
-                VoiceMessage(voiceUrl: widget.msg, voiceName: widget.fileName)),
+          padding:
+              const EdgeInsets.only(left: 10, right: 20, top: 5, bottom: 5),
+          child: AudioPlayer(
+            source: ap.AudioSource.uri(Uri.parse(widget.msg)),
+            // onDelete: () {
+            //   setState(() => showPlayer = false);
+            // },
+          ),
+          // VoiceMessage(voiceUrl: widget.msg, voiceName: widget.fileName)
+        ),
       );
     }
     return body;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    initializePlayer(widget.msg);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // initializePlayer(widget.msg);
+  // }
 
-  @override
-  void dispose() {
-    _videoPlayerController!.dispose();
-    _chewieController?.dispose();
+  // @override
+  // void dispose() {
+  //   // _videoPlayerController.dispose();
+  //   _chewieController?.dispose();
 
-    super.dispose();
-  }
+  //   super.dispose();
+  // }
 
-  Future<void> initializePlayer(videoUrl) async {
-    _videoPlayerController = VideoPlayerController.network(videoUrl);
-    Future.wait([
-      _videoPlayerController!.initialize(),
-    ]);
-    _createChewieController();
-    setState(() {});
-  }
+  // Future<void> initializePlayer(videoUrl) async {
+  //   _videoPlayerController = VideoPlayerController.network(videoUrl)
+  //     ..initialize().then((_) {
+  //       // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+  //       _createChewieController();
 
-  void _createChewieController() {
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController!,
-      autoPlay: false,
-      looping: true,
-      progressIndicatorDelay:
-          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-      hideControlsTimer: const Duration(seconds: 1),
-    );
-  }
+  //       setState(() {});
+  //     });
+  //   // Future.wait([
+  //   //   _videoPlayerController.initialize(),
+  //   // ]);
+  //   // setState(() {});
+  // }
+
+  // void _createChewieController() {
+  //   _chewieController = ChewieController(
+  //     videoPlayerController: _videoPlayerController,
+  //     autoPlay: false,
+  //     looping: true,
+  //     progressIndicatorDelay:
+  //         bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+  //     hideControlsTimer: const Duration(seconds: 1),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
