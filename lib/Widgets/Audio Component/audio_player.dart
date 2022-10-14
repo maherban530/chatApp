@@ -35,7 +35,7 @@ class AudioPlayerState extends State<AudioPlayer> {
   final ap.AudioPlayer _audioPlayer = ap.AudioPlayer();
   late StreamSubscription<ap.PlayerState> _playerStateChangedSubscription;
   late StreamSubscription<Duration?> _durationChangedSubscription;
-  late StreamSubscription<Duration> _positionChangedSubscription;
+  late StreamSubscription<Duration?> _positionChangedSubscription;
 
   @override
   void initState() {
@@ -56,7 +56,11 @@ class AudioPlayerState extends State<AudioPlayer> {
   }
 
   Future<void> _init() async {
-    await _audioPlayer.setAudioSource(widget.source);
+    try {
+      await _audioPlayer.setAudioSource(widget.source);
+    } catch (e) {
+      print("Error loading audio source: $e");
+    }
   }
 
   @override
@@ -70,51 +74,48 @@ class AudioPlayerState extends State<AudioPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final Duration position = _audioPlayer.position;
-        final Duration? duration = _audioPlayer.duration;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _buildControl(),
-                Expanded(child: _buildSlider()),
-                // IconButton(
-                //   icon: const Icon(
-                //     Icons.delete,
-                //     color: Colors.white,
-                //     size: _deleteBtnSize,
-                //   ),
-                //   onPressed: () {
-                //     // ignore: always_specify_types
-                //     _audioPlayer.stop().then((value) => widget.onDelete());
-                //   },
-                // ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Padding(
-                // padding: EdgeInsets.only(
-                //     right: MediaQuery.of(context).size.width * .3, left: 14),
-                // child:
-                Text(position.toString().split(".")[0],
-                    style: const TextStyle(color: Colors.white)),
-                // ),
-                if (duration != null)
-                  Text(duration.toString().split(".")[0],
-                      style: const TextStyle(color: Colors.white))
-              ],
-            ),
+    final Duration position = _audioPlayer.position;
+    final Duration? duration = _audioPlayer.duration;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            _buildControl(),
+            Expanded(child: _buildSlider()),
+            // IconButton(
+            //   icon: const Icon(
+            //     Icons.delete,
+            //     color: Colors.white,
+            //     size: _deleteBtnSize,
+            //   ),
+            //   onPressed: () {
+            //     // ignore: always_specify_types
+            //     _audioPlayer.stop().then((value) => widget.onDelete());
+            //   },
+            // ),
           ],
-        );
-      },
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Padding(
+            // padding: EdgeInsets.only(
+            //     right: MediaQuery.of(context).size.width * .3, left: 14),
+            // child:
+            Text(position.toString().split(".")[0],
+                style: const TextStyle(color: Colors.white)),
+            // ),
+            if (duration != null)
+              Text(duration.toString().split(".")[0],
+                  style: const TextStyle(color: Colors.white))
+          ],
+        ),
+      ],
     );
   }
 
@@ -136,11 +137,11 @@ class AudioPlayerState extends State<AudioPlayer> {
         color: color,
         child: InkWell(
           child: SizedBox(child: icon),
-          onTap: () {
+          onTap: () async {
             if (_audioPlayer.playerState.playing) {
-              pause();
+              await pause();
             } else {
-              play();
+              await play();
             }
           },
         ),
@@ -160,26 +161,24 @@ class AudioPlayerState extends State<AudioPlayer> {
     // double width = widgetWidth - _controlSize - _deleteBtnSize;
     // width -= _deleteBtnSize;
 
-    return Container(
-      child: SliderTheme(
-        data: const SliderThemeData(
-          thumbColor: Colors.white,
-          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
-          overlayShape: RoundSliderOverlayShape(overlayRadius: 16.0),
-        ),
-        child: Slider(
-          activeColor: Theme.of(context).cardColor,
-          inactiveColor: Theme.of(context).disabledColor,
-          onChanged: (double v) {
-            if (duration != null) {
-              final double position = v * duration.inMilliseconds;
-              _audioPlayer.seek(Duration(milliseconds: position.round()));
-            }
-          },
-          value: canSetValue && duration != null
-              ? position.inMilliseconds / duration.inMilliseconds
-              : 0.0,
-        ),
+    return SliderTheme(
+      data: const SliderThemeData(
+        thumbColor: Colors.white,
+        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8),
+        overlayShape: RoundSliderOverlayShape(overlayRadius: 16.0),
+      ),
+      child: Slider(
+        activeColor: Theme.of(context).cardColor,
+        inactiveColor: Theme.of(context).disabledColor,
+        onChanged: (double v) {
+          if (duration != null) {
+            final double position = v * duration.inMilliseconds;
+            _audioPlayer.seek(Duration(milliseconds: position.round()));
+          }
+        },
+        value: canSetValue && duration != null
+            ? position.inMilliseconds / duration.inMilliseconds
+            : 0.0,
       ),
     );
   }

@@ -340,6 +340,9 @@ class _MessagesComposeState extends State<MessagesCompose>
                       // voice message
 
                     }
+                    // provider.scrollController.jumpTo(
+                    //   provider.scrollController.position.maxScrollExtent,
+                    // );
                   },
                   icon: Icon(
                     sendChatButton
@@ -517,11 +520,12 @@ class _MessagesComposeState extends State<MessagesCompose>
       BuildContext context) {
     uploadTask.snapshotEvents.listen((event) {
       uploadingNotification(
-          fileType,
-          Provider.of<AuthProvider>(context, listen: false).peerUserData!.name,
-          event.totalBytes,
-          event.bytesTransferred,
-          true);
+        fileType,
+        Provider.of<AuthProvider>(context, listen: false).peerUserData!.name,
+        event.totalBytes,
+        event.bytesTransferred,
+        // true
+      );
     });
     uploadTask.whenComplete(() => {
           // uploadingNotification(

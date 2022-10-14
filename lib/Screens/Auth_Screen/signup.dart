@@ -66,7 +66,7 @@ class _SignUp extends State<SignUp> {
                                 if (_formKey.currentState!.validate()) {
                                   _onRegisterButtonPressed(
                                     _firstNameController.text,
-                                    int.parse(_phoneController.text),
+                                    _phoneController.text,
                                     _emailController.text,
                                     _passwordController.text,
                                   );
@@ -264,11 +264,11 @@ class _SignUp extends State<SignUp> {
   }
 
   void _onRegisterButtonPressed(
-      String firstName, int phone, String email, String password) async {
+      String firstName, String phone, String email, String password) async {
     Users userModel = Users(
       email: email,
       name: firstName,
-      password: password,
+      userPic: '',
       phoneNumber: phone,
       userStatus: 'Online',
       fcmToken: '',
@@ -276,7 +276,7 @@ class _SignUp extends State<SignUp> {
     );
 
     final provider = Provider.of<AuthProvider>(context, listen: false);
-    provider.signUp(userModel).then((result) {
+    provider.signUp(userModel, password).then((result) {
       if (result) {
         Navigator.pushReplacementNamed(
           context,

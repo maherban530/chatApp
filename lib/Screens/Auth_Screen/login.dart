@@ -127,13 +127,23 @@ class _LogIn extends State<LogIn> {
                     ),
                   )),
               ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(
-                      context,
-                      AppRoutes.signup,
-                    );
-                  },
-                  child: const Text('SignUp'))
+                onPressed: () {
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.signup,
+                  );
+                },
+                child: const Text('SignUp'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.phonelogin,
+                  );
+                },
+                child: const Text('LogIn with Phone Number'),
+              ),
             ],
           ),
         ),

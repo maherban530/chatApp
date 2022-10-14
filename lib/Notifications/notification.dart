@@ -32,54 +32,56 @@ void notificationCallInitialization() {
   ]);
 }
 
-Future<void> uploadingNotification(
-    fileType, receiverName, maxProgress, progress, isUploading) async {
+Future<void> uploadingNotification(fileType, receiverName, maxProgress, progress
+    // isUploading
+    ) async {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  if (isUploading) {
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-            "uploading files", "Uploading Files Notifications",
-            channelDescription: "show to user progress for uploading files",
-            channelShowBadge: false,
-            importance: Importance.max,
-            priority: Priority.high,
-            onlyAlertOnce: true,
-            showProgress: true,
-            maxProgress: maxProgress,
-            progress: progress,
-            autoCancel: false);
+  // if (isUploading) {
+  final AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+          "uploading files", "Uploading Files Notifications",
+          channelDescription: "show to user progress for uploading files",
+          channelShowBadge: false,
+          importance: Importance.max,
+          priority: Priority.high,
+          onlyAlertOnce: true,
+          showProgress: progress != maxProgress ? true : false,
+          maxProgress: maxProgress,
+          progress: progress,
+          autoCancel: false);
 
-    NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      5,
-      'Sending $fileType to $receiverName',
-      '',
-      platformChannelSpecifics,
-    );
-  } else {
-    flutterLocalNotificationsPlugin.cancel(5);
-    AndroidNotificationDetails androidPlatformChannelSpecifics =
-        const AndroidNotificationDetails(
-      "files",
-      "Files Notifications",
-      channelDescription: "Inform user files uploaded",
-      channelShowBadge: false,
-      importance: Importance.max,
-      priority: Priority.high,
-      onlyAlertOnce: true,
-    );
+  NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.show(
+    5,
+    '${progress != maxProgress ? 'Sending' : 'Done'} $fileType to $receiverName',
+    '',
+    platformChannelSpecifics,
+  );
 
-    NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      Random().nextInt(1000000),
-      '$fileType sent to $receiverName',
-      '',
-      platformChannelSpecifics,
-    );
-  }
+  // } else {
+  //   flutterLocalNotificationsPlugin.cancel(5);
+  //   AndroidNotificationDetails androidPlatformChannelSpecifics =
+  //       const AndroidNotificationDetails(
+  //     "files",
+  //     "Files Notifications",
+  //     channelDescription: "Inform user files uploaded",
+  //     channelShowBadge: false,
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //     onlyAlertOnce: true,
+  //   );
+
+  //   NotificationDetails platformChannelSpecifics =
+  //       NotificationDetails(android: androidPlatformChannelSpecifics);
+  //   await flutterLocalNotificationsPlugin.show(
+  //     Random().nextInt(1000000),
+  //     '$fileType sent to $receiverName',
+  //     '',
+  //     platformChannelSpecifics,
+  //   );
+  // }
 }
 
 Future<void> downloadingNotification(

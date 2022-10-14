@@ -18,15 +18,18 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(seconds: 1), () {
       final provider = Provider.of<AuthProvider>(context, listen: false);
-      provider.currentUserId != ''
-          ? Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.home,
-            )
-          : Navigator.pushReplacementNamed(
-              context,
-              AppRoutes.signup,
-            );
+      if (provider.currentUserId != '') {
+        provider.checkUserData(context);
+        // Navigator.pushReplacementNamed(
+        //   context,
+        //   AppRoutes.home,
+        // );
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          AppRoutes.login,
+        );
+      }
     });
   }
   // void initState() {

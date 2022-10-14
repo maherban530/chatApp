@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'dart:math' as math;
+
 import 'package:chat_app/Widgets/receiver_message_card.dart';
 import 'package:chat_app/Widgets/sender_message_card.dart';
 import 'package:chat_app/Widgets/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 // import 'package:full_chat_application/widget/receiver_message_card.dart';
 // import 'package:full_chat_application/widget/sender_message_card.dart';
 import 'package:intl/intl.dart';
@@ -100,9 +103,14 @@ class Messages extends StatelessWidget {
   }
 }
 
-class MessageList extends StatelessWidget {
+class MessageList extends StatefulWidget {
   const MessageList({super.key});
 
+  @override
+  State<MessageList> createState() => _MessageListState();
+}
+
+class _MessageListState extends State<MessageList> {
   Future<void> downloadFile(context, fileUrl, fileName, fileType) async {
     Directory? appDocDir = await getApplicationDocumentsDirectory();
     final status = await Permission.storage.request();
@@ -141,65 +149,139 @@ class MessageList extends StatelessWidget {
     }
   }
 
+  bool isScrollVisible = true;
+  final scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    scrollController.addListener(() {
+      if (scrollController.position.atEdge) {
+        if (scrollController.position.pixels > 0) {
+          if (isScrollVisible) {
+            setState(() {
+              isScrollVisible = false;
+            });
+          }
+        }
+      } else {
+        if (!isScrollVisible) {
+          setState(() {
+            isScrollVisible = true;
+          });
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    Iterable<MessagesModel>? messagesList =
-        Provider.of<Iterable<MessagesModel>?>(context);
+    List<MessagesModel>? messagesList =
+        Provider.of<List<MessagesModel>?>(context);
     var provider = Provider.of<AuthProvider>(context, listen: false);
 
     return messagesList == null
         ? const Center(child: CircularProgressIndicator())
         : messagesList.isEmpty
             ? const Center(child: Text("Messages Not Found"))
-            : ListView.builder(
-                reverse: true,
-                shrinkWrap: true,
-                itemCount: messagesList.length,
-                itemBuilder: (context, index) {
-                  var messages = messagesList.toList()[index];
-                  if (provider.currentUserId == messages.senderId) {
-                    return InkWell(
-                      onTap: () {
-                        if (messages.msgType == "document" ||
-                            messages.msgType == "voice message") {
-                          downloadFile(context, messages.message,
-                              messages.fileName, messages.msgType);
+            : Stack(
+                children: [
+                  ListView.builder(
+                      reverse: true,
+                      shrinkWrap: true,
+                      controller: scrollController,
+                      itemCount: messagesList.length,
+                      itemBuilder: (context, index) {
+                        var messages = messagesList.toList()[index];
+                        if (provider.currentUserId == messages.senderId) {
+                          return InkWell(
+                            onTap: () {
+                              if (messages.msgType == "document" ||
+                                  messages.msgType == "voice message") {
+                                downloadFile(context, messages.message,
+                                    messages.fileName, messages.msgType);
+                              }
+                            },
+                            child: SenderMessageCard(
+                                messages.fileName,
+                                messages.msgType.toString(),
+                                messages.message.toString(),
+                                messages.msgTime == null
+                                    ? DateFormat('dd-MM-yyyy hh:mm a').format(
+                                        DateTime.parse(Timestamp.now()
+                                            .toDate()
+                                            .toString()))
+                                    : DateFormat('dd-MM-yyyy hh:mm a').format(
+                                        DateTime.parse(messages.msgTime!
+                                            .toDate()
+                                            .toString()))),
+                          );
+                        } else {
+                          return InkWell(
+                            onTap: () {
+                              if (messages.msgType == "document" ||
+                                  messages.msgType == "voice message") {
+                                downloadFile(context, messages.message,
+                                    messages.fileName, messages.msgType);
+                              }
+                            },
+                            child: ReceiverMessageCard(
+                                messages.fileName,
+                                messages.msgType.toString(),
+                                messages.message.toString(),
+                                messages.msgTime == null
+                                    ? DateFormat('dd-MM-yyyy hh:mm a').format(
+                                        DateTime.parse(Timestamp.now()
+                                            .toDate()
+                                            .toString()))
+                                    : DateFormat('dd-MM-yyyy hh:mm a').format(
+                                        DateTime.parse(messages.msgTime!
+                                            .toDate()
+                                            .toString()))),
+                          );
                         }
-                      },
-                      child: SenderMessageCard(
-                          messages.fileName,
-                          messages.msgType.toString(),
-                          messages.message.toString(),
-                          messages.msgTime == null
-                              ? DateFormat('dd-MM-yyyy hh:mm a').format(
-                                  DateTime.parse(
-                                      Timestamp.now().toDate().toString()))
-                              : DateFormat('dd-MM-yyyy hh:mm a').format(
-                                  DateTime.parse(
-                                      messages.msgTime!.toDate().toString()))),
-                    );
-                  } else {
-                    return InkWell(
-                      onTap: () {
-                        if (messages.msgType == "document" ||
-                            messages.msgType == "voice message") {
-                          downloadFile(context, messages.message,
-                              messages.fileName, messages.msgType);
-                        }
-                      },
-                      child: ReceiverMessageCard(
-                          messages.fileName,
-                          messages.msgType.toString(),
-                          messages.message.toString(),
-                          messages.msgTime == null
-                              ? DateFormat('dd-MM-yyyy hh:mm a').format(
-                                  DateTime.parse(
-                                      Timestamp.now().toDate().toString()))
-                              : DateFormat('dd-MM-yyyy hh:mm a').format(
-                                  DateTime.parse(
-                                      messages.msgTime!.toDate().toString()))),
-                    );
-                  }
-                });
+                      }),
+                  // ),
+                  Positioned(
+                    bottom: 20, right: 18,
+                    // alignment: Alignment.bottomRight,
+                    child: Visibility(
+                      visible: isScrollVisible,
+                      child: InkWell(
+                        // radius: 34,
+                        // splashRadius: 50,
+                        splashColor: Colors.grey,
+                        highlightColor: Colors.grey,
+                        // color: Colors.red,
+                        overlayColor: MaterialStateProperty.all(Colors.grey),
+                        // child: Transform.rotate(
+                        //   angle: 280 * math.pi / 186,
+                        child: const Icon(
+                          Icons.expand_circle_down_rounded,
+                          // chevron_left,
+                          color: Colors.black,
+                          size: 38,
+                        ),
+                        // ),
+                        // const Icon(Icons.expand_circle_down_rounded,
+                        //     color: Colors.black, size: 38),
+                        onTap: () {
+                          // provider.
+                          scrollController.jumpTo(
+                            scrollController.position.maxScrollExtent,
+                          );
+
+                          // scrollController.animateTo(
+                          //   messagesList.length.toDouble(),
+                          //   duration: const Duration(milliseconds: 100),
+                          //   curve: Curves.easeInOut,
+                          // );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              );
   }
 }

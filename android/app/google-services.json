@@ -7,12 +7,49 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:240889480824:android:194dc19eac3dc9cccb8f8d",
+        "android_client_info": {
+          "package_name": "chat.app.bego.full_chat_application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "240889480824-hcqlujmsjm5l8ar8k8tqb54sbhkm16dg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGWHiL_UcKWX0siwYxBOYlbEzzZ2S7POk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "240889480824-hcqlujmsjm5l8ar8k8tqb54sbhkm16dg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:240889480824:android:2be43b7d186cbeedcb8f8d",
         "android_client_info": {
           "package_name": "com.example.chat_app"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "240889480824-o85gjl78fdirfe3vfle5gee0ub7ik7pg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.chat_app",
+            "certificate_hash": "06f1a9cd74adbb6a5b0e2eba9ddd68f62dfc209c"
+          }
+        },
         {
           "client_id": "240889480824-hcqlujmsjm5l8ar8k8tqb54sbhkm16dg.apps.googleusercontent.com",
           "client_type": 3

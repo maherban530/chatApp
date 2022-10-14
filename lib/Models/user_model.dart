@@ -1,9 +1,9 @@
 class Users {
   String? uid;
   String? name;
-  int? phoneNumber;
+  String? phoneNumber;
   String? email;
-  String? password;
+  String? userPic;
   String? fcmToken;
   dynamic userStatus;
 
@@ -12,18 +12,18 @@ class Users {
       this.name,
       this.phoneNumber,
       this.email,
-      this.password,
+      this.userPic,
       this.fcmToken,
       this.userStatus});
 
   Users.fromJson(Map<String, dynamic> json) {
-    uid = json['uid'];
-    name = json['name'];
-    phoneNumber = json['phoneNumber'];
-    email = json['email'];
-    password = json['password'];
-    fcmToken = json['fcmToken'];
-    userStatus = json['userStatus'];
+    uid = json['uid'] ?? '';
+    name = json['name'] ?? '';
+    phoneNumber = json['phoneNumber'] ?? '';
+    email = json['email'] ?? '';
+    userPic = json['userPic'] ?? '';
+    fcmToken = json['fcmToken'] ?? '';
+    userStatus = json['userStatus'] ?? '';
   }
 
   Map<String, dynamic> toJson() {
@@ -32,9 +32,15 @@ class Users {
     data['name'] = name;
     data['phoneNumber'] = phoneNumber;
     data['email'] = email;
-    data['password'] = password;
+    data['userPic'] = userPic;
     data['fcmToken'] = fcmToken;
     data['userStatus'] = userStatus;
     return data;
   }
+}
+
+class UserIdModel {
+  final String? userId;
+
+  UserIdModel(this.userId);
 }

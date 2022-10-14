@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:chat_app/Widgets/audio_file.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -51,6 +52,8 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
                         maxScale: 2,
                         child: FadeInImage.assetNetwork(
                           placeholder: 'assets/images/Fading lines.gif',
+                          placeholderCacheHeight: 50,
+                          placeholderCacheWidth: 50,
                           image: widget.msg,
                         ),
                       ),
@@ -64,6 +67,8 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
               borderRadius: BorderRadius.circular(8),
               child: FadeInImage.assetNetwork(
                 placeholder: 'assets/images/Fading lines.gif',
+                placeholderCacheHeight: 50,
+                placeholderCacheWidth: 50,
                 image: widget.msg,
               ),
             ),
@@ -73,9 +78,17 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
     } else if (widget.msgType == "text") {
       body = Padding(
         padding: const EdgeInsets.only(left: 10, right: 20, top: 5, bottom: 5),
-        child: SelectableText(
-          widget.msg,
-          style: const TextStyle(fontSize: 16, color: Colors.white),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            // maxHeight: 300,
+            // minHeight: 200,
+            maxWidth: 280,
+            // minWidth: 200
+          ),
+          child: SelectableText(
+            widget.msg,
+            style: const TextStyle(fontSize: 16, color: Colors.white),
+          ),
         ),
       );
     } else if (widget.msgType == "video") {
@@ -136,11 +149,18 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
         ),
       );
     } else if (widget.msgType == "audio") {
-      body = body = Padding(
-        padding: const EdgeInsets.only(left: 10, right: 20, top: 5, bottom: 5),
-        child: SelectableText(
-          widget.fileName,
-          style: const TextStyle(fontSize: 16, color: Colors.white),
+      body = body = SizedBox(
+        width: MediaQuery.of(context).size.width * .7,
+        child: Padding(
+          padding:
+              const EdgeInsets.only(left: 10, right: 20, top: 5, bottom: 5),
+          child: AudioPlayer(
+            source: ap.AudioSource.uri(Uri.parse(widget.msg)),
+            // onDelete: () {
+            //   setState(() => showPlayer = false);
+            // },
+          ),
+          // VoiceMessage(voiceUrl: widget.msg, voiceName: widget.fileName),
         ),
       );
     } else if (widget.msgType == "voice message") {
@@ -155,7 +175,7 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
             //   setState(() => showPlayer = false);
             // },
           ),
-          // VoiceMessage(voiceUrl: widget.msg, voiceName: widget.fileName)
+          // VoiceMessage(voiceUrl: widget.msg, voiceName: widget.fileName),
         ),
       );
     }

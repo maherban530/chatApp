@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 
 import '../Core/route_path.dart';
 import '../Database/database_path.dart';
-import '../Models/last_message_model.dart';
 import '../Models/messages_model.dart';
 import '../Models/user_model.dart';
+import '../Widgets/utils.dart';
 
 class AuthProvider extends ChangeNotifier {
   FirebaseAuth get _firebaseAuth => FirebaseAuth.instance;
@@ -20,15 +20,151 @@ class AuthProvider extends ChangeNotifier {
 
   Users? peerUserData;
   List<Users> userList = [];
-  // bool startVoiceMessage = false;
+  bool scrollChat = false;
+  final scrollController = ScrollController();
 
-  Future signUp(Users users) async {
+  scrolUp(bool value) => scrollChat = value;
+  scrolDown(bool value) => scrollChat = value;
+
+  Future<String> _fToken() async =>
+      await FirebaseMessaging.instance.getToken() ?? "";
+
+  /// Invoke to signIn user with phone number.
+  Future<void> signInWithPhone(
+    BuildContext context, {
+    required String phoneNumber,
+  }) async {
+    try {
+      await _firebaseAuth.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (_) {},
+        verificationFailed: (FirebaseAuthException error) {
+          throw Exception(error.message);
+        },
+        codeSent: (String verificationId, int? forceResendingToken) {
+          Navigator.pushNamed(
+            context,
+            AppRoutes.otpscreen,
+            arguments: verificationId,
+          );
+        },
+        codeAutoRetrievalTimeout: (_) {},
+      );
+    } on FirebaseAuthException catch (e) {
+      buildShowSnackBar(context, e.message!);
+    }
+  }
+
+  /// Invoke to verify otp.
+  Future<void> verifyOTP(
+    BuildContext context,
+    bool mounted, {
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+
+      // UserCredential userCredential =
+      await _firebaseAuth
+          .signInWithCredential(credential)
+          .then((userCredential) async {
+        if (userCredential.user != null) {
+          if (userCredential.additionalUserInfo!.isNewUser) {
+            Users users = Users(
+              email: '',
+              fcmToken: await _fToken(),
+              name: '',
+              userStatus: 'Online',
+              userPic: '',
+              uid: userCredential.user!.uid,
+              phoneNumber: userCredential.user!.phoneNumber,
+            );
+            await _firebaseStore
+                .doc('${DatabasePath.userCollection}/$currentUserId')
+                .set(users.toJson(), SetOptions(merge: true))
+                .then((value) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.userinfoget,
+                arguments: UserIdModel(userCredential.user!.uid),
+                (route) => false,
+              );
+            });
+          } else {
+            checkUserData(context);
+            // _firebaseStore
+            //     .collection(DatabasePath.userCollection)
+            //     .doc(userCredential.user!.uid)
+            //     .get()
+            //     .then((snapShot) {
+            //   var userData = Users.fromJson(snapShot.data()!);
+            //   if (userData.email!.isEmpty || userData.name!.isEmpty) {
+            //     Navigator.pushNamedAndRemoveUntil(
+            //       context,
+            //       AppRoutes.userinfoget,
+            //       arguments: UserIdModel(userCredential.user!.uid),
+            //       // {"userId": userCredential.user!.uid},
+            //       (route) => false,
+            //     );
+            //   } else {
+            //     Navigator.pushNamedAndRemoveUntil(
+            //       context,
+            //       AppRoutes.home,
+            //       (route) => false,
+            //     );
+            //   }
+            // });
+            // .map((snapShot) => Users.fromJson(snapShot.data()!));
+
+          }
+        } else {
+          throw Exception('Something went wrong');
+        }
+      });
+
+// userCredential.additionalUserInfo.isNewUser
+
+    } on FirebaseAuthException catch (e) {
+      buildShowSnackBar(context, e.message!);
+    }
+  }
+
+  checkUserData(BuildContext context) {
+    _firebaseStore
+        .collection(DatabasePath.userCollection)
+        .doc(currentUserId)
+        .get()
+        .then((snapShot) {
+      var userData = Users.fromJson(snapShot.data()!);
+      if (userData.email!.isEmpty || userData.name!.isEmpty) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.userinfoget,
+          arguments: UserIdModel(currentUserId),
+          // {"userId": userCredential.user!.uid},
+          (route) => false,
+        );
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.home,
+          (route) => false,
+        );
+      }
+    });
+  }
+
+  Future signUp(Users users, String password) async {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
-          email: users.email!, password: users.password!);
+          email: users.email!, password: password);
       // userCredential.user?.sendEmailVerification();
       users.uid = currentUserId;
-      users.fcmToken = await FirebaseMessaging.instance.getToken() ?? "";
+      users.fcmToken = await _fToken();
       await _firebaseStore
           .doc('${DatabasePath.userCollection}/$currentUserId')
           .set(users.toJson(), SetOptions(merge: true));
@@ -73,12 +209,42 @@ class AuthProvider extends ChangeNotifier {
     // notifyListeners();
   }
 
+  void usersUpdate(BuildContext context, Users users, userId) {
+    _firebaseStore.collection(DatabasePath.userCollection).doc(userId).update({
+      "name": users.name,
+      "email": users.email,
+      "userPic": users.userPic,
+    }).then((value) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.home,
+        (route) => false,
+      );
+    });
+
+    notifyListeners();
+  }
+
   Stream<Users> getLastSeenChat() {
     return _firebaseStore
         .collection(DatabasePath.userCollection)
-        .where('uid', isEqualTo: peerUserData!.uid)
+        .doc(peerUserData!.uid)
+        // .where('uid', isEqualTo: peerUserData!.uid)
         .snapshots()
-        .map((snapShot) => Users.fromJson(snapShot.docs[0].data()));
+        .map((snapShot) => Users.fromJson(snapShot.data()!));
+    //     .then((QuerySnapshot value) {
+    //   peerUserData =
+    //       Users.fromJson(value.docs[0].data() as Map<String, dynamic>);
+    // });
+  }
+
+  Stream<Users> getUserDetalsWithId(userId) {
+    return _firebaseStore
+        .collection(DatabasePath.userCollection)
+        .doc(userId)
+        // .where('uid', isEqualTo: userId)
+        .snapshots()
+        .map((snapShot) => Users.fromJson(snapShot.data()!));
     //     .then((QuerySnapshot value) {
     //   peerUserData =
     //       Users.fromJson(value.docs[0].data() as Map<String, dynamic>);
@@ -98,7 +264,7 @@ class AuthProvider extends ChangeNotifier {
   //   // });
   // }
 
-  Stream<Iterable<MessagesModel>> getMessages({required String chatId}) {
+  Stream<List<MessagesModel>> getMessages({required String chatId}) {
     return FirebaseFirestore.instance
         .collection(DatabasePath.messages)
         .doc(chatId)
@@ -106,13 +272,14 @@ class AuthProvider extends ChangeNotifier {
         .orderBy("msgTime", descending: true)
         .snapshots()
         .map((snapShot) => snapShot.docs
-            .map((document) => MessagesModel.fromJson(document.data())));
+            .map((document) => MessagesModel.fromJson(document.data()))
+            .toList());
   }
 
-  void usersClickListener(Users snapshot, BuildContext context) {
+  void usersClickListener(Users users, BuildContext context) {
     _firebaseStore
         .collection(DatabasePath.userCollection)
-        .where('uid', isEqualTo: snapshot.uid)
+        .where('uid', isEqualTo: users.uid)
         .get()
         .then((QuerySnapshot value) {
       peerUserData =
