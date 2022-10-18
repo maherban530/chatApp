@@ -55,7 +55,7 @@ Future<void> uploadingNotification(fileType, receiverName, maxProgress, progress
       NotificationDetails(android: androidPlatformChannelSpecifics);
   await flutterLocalNotificationsPlugin.show(
     5,
-    '${progress != maxProgress ? 'Sending' : 'Done'} $fileType to $receiverName',
+    '${progress != maxProgress ? 'Sending' : 'Send Successful'} $fileType to $receiverName',
     '',
     platformChannelSpecifics,
   );

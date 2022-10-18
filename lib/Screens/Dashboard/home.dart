@@ -122,10 +122,31 @@ class UserList extends StatelessWidget {
                                                 } else {
                                                   var messageData =
                                                       snapshot1.data!.first!;
-                                                  return Text(
-                                                      "${messageData.senderId == Provider.of<AuthProvider>(context).currentUserId ? "Sent by You" : snapshot2.data!.phoneNumber}: ${getFileType(messageData)}",
-                                                      style: const TextStyle(
-                                                          fontSize: 13));
+                                                  return Wrap(
+                                                    crossAxisAlignment:
+                                                        WrapCrossAlignment.end,
+                                                    children: [
+                                                      Text(
+                                                          "${messageData.senderId == Provider.of<AuthProvider>(context).currentUserId ? "Sent by You" : snapshot2.data!.phoneNumber}: ${getFileType(messageData)}",
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize:
+                                                                      13)),
+                                                      messageData.isRead!
+                                                          ? const Icon(
+                                                              Icons.done_all,
+                                                              color:
+                                                                  Colors.teal,
+                                                              size: 14,
+                                                            )
+                                                          : const Icon(
+                                                              Icons.done,
+                                                              color:
+                                                                  Colors.teal,
+                                                              size: 14,
+                                                            ),
+                                                    ],
+                                                  );
                                                 }
                                               },
                                             ),

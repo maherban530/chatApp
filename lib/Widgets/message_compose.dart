@@ -557,7 +557,8 @@ class _MessagesComposeState extends State<MessagesCompose>
                   receiverId: Provider.of<AuthProvider>(context, listen: false)
                       .peerUserData!
                       .uid,
-                  msgTime: FieldValue.serverTimestamp(),
+                  msgTime: Timestamp.now(),
+                  // FieldValue.serverTimestamp(),
                   msgType: fileType,
                   message: value,
                   fileName: (fileType == "document") ||

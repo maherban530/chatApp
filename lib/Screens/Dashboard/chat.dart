@@ -37,7 +37,9 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _appProvider.updateUserStatus(FieldValue.serverTimestamp());
+    _appProvider.updateUserStatus(
+      Timestamp.now(),
+    );
     _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
 
     // updatePeerDevice(_appProvider.auth.currentUser!.email, "0");
@@ -48,19 +50,25 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.paused:
-        _appProvider.updateUserStatus(FieldValue.serverTimestamp());
+        _appProvider.updateUserStatus(
+          Timestamp.now(),
+        );
         _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
 
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, "0");
         break;
       case AppLifecycleState.inactive:
-        _appProvider.updateUserStatus(FieldValue.serverTimestamp());
+        _appProvider.updateUserStatus(
+          Timestamp.now(),
+        );
         _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
 
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, "0");
         break;
       case AppLifecycleState.detached:
-        _appProvider.updateUserStatus(FieldValue.serverTimestamp());
+        _appProvider.updateUserStatus(
+          Timestamp.now(),
+        );
         _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, "0");
         break;

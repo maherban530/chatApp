@@ -1,10 +1,5 @@
-import 'dart:async';
-import 'package:chat_app/Widgets/audio_file.dart';
-import 'package:chat_app/Widgets/messages.dart';
-import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
 
 import '../Models/messages_model.dart';
@@ -244,6 +239,7 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
             Padding(
               padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
               child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.end,
                 children: [
                   Text(
                       widget.messageList.msgTime == null
