@@ -7,7 +7,9 @@ class MessagesModel {
   Timestamp? msgTime;
   String? msgType;
   String? message;
+  bool? isRead;
   dynamic fileName;
+  String? docId;
 
   MessagesModel({
     this.chatId,
@@ -16,7 +18,9 @@ class MessagesModel {
     this.msgTime,
     this.msgType,
     this.message,
+    this.isRead,
     this.fileName,
+    this.docId,
   });
 
   MessagesModel.fromJson(Map<String, dynamic> json) {
@@ -26,7 +30,9 @@ class MessagesModel {
     msgTime = json['msgTime'];
     msgType = json['msgType'] ?? '';
     message = json['message'] ?? '';
+    isRead = json['isRead'];
     fileName = json['fileName'] ?? '';
+    docId = json['docId'] ?? '';
   }
 
   Map<String, dynamic> toJson() {
@@ -37,7 +43,10 @@ class MessagesModel {
     data['msgTime'] = msgTime;
     data['msgType'] = msgType;
     data['message'] = message;
+    data['isRead'] = isRead;
     data['fileName'] = fileName;
+    data['docId'] = docId;
+
     return data;
   }
 }

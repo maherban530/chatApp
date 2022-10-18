@@ -33,7 +33,7 @@ class _ReceiverMessageCardState extends State<ReceiverMessageCard> {
         padding: const EdgeInsets.only(top: 5, bottom: 5),
         child: ConstrainedBox(
           constraints: const BoxConstraints(
-            maxHeight: 300,
+            // maxHeight: 300,
             // minHeight: 200,
             maxWidth: 290,
             // minWidth: 200

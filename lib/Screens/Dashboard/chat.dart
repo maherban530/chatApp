@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../Models/messages_model.dart';
 import '../../Widgets/last_seen_chat.dart';
 import '../../Widgets/message_compose.dart';
 import '../../Widgets/messages.dart';
@@ -22,12 +23,14 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _appProvider = Provider.of<AuthProvider>(context, listen: false);
     _appProvider.updateUserStatus("Online");
+    _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
     // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, Provider.of<MyProvider>(context,listen: false).peerUserData!["email"]);
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
+    _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
     super.didChangeDependencies();
   }
 
@@ -35,6 +38,8 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _appProvider.updateUserStatus(FieldValue.serverTimestamp());
+    _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+
     // updatePeerDevice(_appProvider.auth.currentUser!.email, "0");
     super.dispose();
   }
@@ -44,18 +49,25 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.paused:
         _appProvider.updateUserStatus(FieldValue.serverTimestamp());
+        _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, "0");
         break;
       case AppLifecycleState.inactive:
         _appProvider.updateUserStatus(FieldValue.serverTimestamp());
+        _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, "0");
         break;
       case AppLifecycleState.detached:
         _appProvider.updateUserStatus(FieldValue.serverTimestamp());
+        _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, "0");
         break;
       case AppLifecycleState.resumed:
         _appProvider.updateUserStatus("Online");
+        _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+        // _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, Provider.of<MyProvider>(context,listen: false).peerUserData!["email"]);
         break;
     }

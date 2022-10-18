@@ -300,13 +300,58 @@ class AuthProvider extends ChangeNotifier {
         .update({'userStatus': userStatus});
   }
 
+  void getMessagesListData({required String chatId}) {
+    FirebaseFirestore.instance
+        .collection(DatabasePath.messages)
+        .doc(chatId)
+        .collection(chatId)
+        .orderBy("msgTime", descending: true)
+        .get();
+    // .map((snapShot) => snapShot.docs
+    //     .map((document) => MessagesModel.fromJson(document.data()))
+    //     .toList());
+  }
+
+  void updatePeerUserRead(chatId, isReadStatus) async {
+    // var collectionExistt = _firebaseStore
+    //     .collection(DatabasePath.messages)
+    //     .doc(chatId)
+    //     .collection(chatId)
+    //     .where('isRead', isEqualTo: false);
+
+    var collection = _firebaseStore
+        .collection(DatabasePath.messages)
+        .doc(chatId)
+        .collection(chatId)
+        .where('receiverId', isEqualTo: currentUserId)
+        .where('isRead', isEqualTo: false);
+
+    var querySnapshots = await collection.get();
+
+    for (var doc in querySnapshots.docs) {
+      if (doc.exists) {
+        await doc.reference.update({
+          'isRead': isReadStatus,
+        });
+      }
+    }
+  }
+
+  // void updatePeerUserReadLength() async {
+  //   var collection = _firebaseStore
+  //       .collection(DatabasePath.messages)
+  //       .doc(getChatId())
+  //       .collection(getChatId())
+  //       .where('isRead', isEqualTo: false);
+
+  //   var querySnapshots = await collection.get();
+  //   return querySnapshots;
+  // }
+
   UploadTask getRefrenceFromStorage(file, voiceMessageName, context) {
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage
-        .ref()
-        .child("Media")
-        .child(getChatId(context))
-        .child(file is File
+    Reference ref =
+        storage.ref().child("Media").child(getChatId()).child(file is File
             ? voiceMessageName
             : file.runtimeType == FilePickerResult
                 ? file.files.single.name
@@ -327,20 +372,35 @@ class AuthProvider extends ChangeNotifier {
       required message,
       required fileName}) {
     ///current user
-    _firebaseStore
+    var ref = _firebaseStore
         .collection(DatabasePath.messages)
         .doc(chatId)
         .collection(chatId)
-        .doc("${Timestamp.now().millisecondsSinceEpoch}")
-        .set({
-      'chatId': chatId,
-      'senderId': senderId,
-      'receiverId': receiverId,
-      'msgTime': msgTime,
-      'msgType': msgType,
-      'message': message,
-      'fileName': fileName,
-    });
+        .doc("${Timestamp.now().millisecondsSinceEpoch}");
+
+    MessagesModel messagesModel = MessagesModel(
+      chatId: chatId,
+      message: message,
+      msgType: msgType,
+      msgTime: msgTime,
+      receiverId: receiverId,
+      senderId: senderId,
+      fileName: fileName,
+      isRead: false,
+      docId: ref.id,
+    );
+    // "${Timestamp.now().millisecondsSinceEpoch}"
+    ref.set(messagesModel.toJson()
+        //     {
+        //   'chatId': chatId,
+        //   'senderId': senderId,
+        //   'receiverId': receiverId,
+        //   'msgTime': msgTime,
+        //   'msgType': msgType,
+        //   'message': message,
+        //   'fileName': fileName,
+        // }
+        );
 
     // ////last message create current user
     // _firebaseStore
@@ -654,7 +714,7 @@ class AuthProvider extends ChangeNotifier {
   //   });
   // }
 
-  String getChatId(BuildContext context) {
+  String getChatId() {
     if (currentUserId.hashCode <= peerUserData!.uid.hashCode) {
       return "$currentUserId - ${peerUserData!.uid}";
     } else {

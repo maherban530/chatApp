@@ -96,7 +96,6 @@ class _MessagesComposeState extends State<MessagesCompose>
         if (_isRecording == true) ...[
           // _buildRecordStopControl(),
           // const SizedBox(width: 20),
-
           _buildPauseResumeControl(),
           _buildText()
         ],
@@ -178,10 +177,11 @@ class _MessagesComposeState extends State<MessagesCompose>
                       hintStyle: const TextStyle(
                         color: Colors.white,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 16),
+                      contentPadding:
+                          const EdgeInsets.only(left: 17, top: 5, bottom: 5),
                       suffixIcon: Row(
                         mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
                               onPressed: () async {
@@ -230,36 +230,45 @@ class _MessagesComposeState extends State<MessagesCompose>
                                   await Permission.storage.request();
                                 }
                               },
+                              splashRadius: 20,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              constraints: const BoxConstraints(),
                               icon: const Icon(
                                 Icons.attach_file,
                                 color: Colors.white,
                               )),
                           IconButton(
-                              onPressed: () async {
-                                await Permission.storage
-                                    .request()
-                                    .then((status) async {
-                                  if (status == PermissionStatus.granted) {
-                                    await _picker
-                                        .pickImage(source: ImageSource.camera)
-                                        .then((photo) {
-                                      if (photo != null) {
-                                        UploadTask uploadTask =
-                                            provider.getRefrenceFromStorage(
-                                                photo, "", context);
-                                        uploadFile(
-                                            "", "image", uploadTask, context);
-                                      } else {}
-                                    });
-                                  } else {
-                                    await Permission.storage.request();
-                                  }
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.camera,
-                                color: Colors.white,
-                              ))
+                            splashRadius: 20,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            constraints: const BoxConstraints(),
+                            onPressed: () async {
+                              await Permission.storage
+                                  .request()
+                                  .then((status) async {
+                                if (status == PermissionStatus.granted) {
+                                  await _picker
+                                      .pickImage(source: ImageSource.camera)
+                                      .then((photo) {
+                                    if (photo != null) {
+                                      UploadTask uploadTask =
+                                          provider.getRefrenceFromStorage(
+                                              photo, "", context);
+                                      uploadFile(
+                                          "", "image", uploadTask, context);
+                                    } else {}
+                                  });
+                                } else {
+                                  await Permission.storage.request();
+                                }
+                              });
+                            },
+                            icon: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
                         ],
                       ),
                     )),
@@ -275,10 +284,11 @@ class _MessagesComposeState extends State<MessagesCompose>
                     if (sendChatButton) {
                       //txt message
                       provider.sendMessage(
-                          chatId: provider.getChatId(context),
+                          chatId: provider.getChatId(),
                           senderId: provider.currentUserId,
                           receiverId: provider.peerUserData!.uid,
-                          msgTime: FieldValue.serverTimestamp(),
+                          msgTime: Timestamp.now(),
+                          // FieldValue.serverTimestamp(),
                           msgType: "text",
                           message: _textController.text.toString(),
                           fileName: "");
@@ -541,7 +551,7 @@ class _MessagesComposeState extends State<MessagesCompose>
             fileUrl.ref.getDownloadURL().then((value) {
               Provider.of<AuthProvider>(context, listen: false).sendMessage(
                   chatId: Provider.of<AuthProvider>(context, listen: false)
-                      .getChatId(context),
+                      .getChatId(),
                   senderId: Provider.of<AuthProvider>(context, listen: false)
                       .currentUserId,
                   receiverId: Provider.of<AuthProvider>(context, listen: false)

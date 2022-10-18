@@ -76,23 +76,7 @@ class UserList extends StatelessWidget {
                       ? const SizedBox.shrink()
                       : Padding(
                           padding: const EdgeInsets.all(2.0),
-                          child: ListTile(
-                            dense: true,
-                            tileColor: Colors.teal.shade50,
-                            leading: const Icon(
-                                // provider.currentUserId == users.uid
-                                //   ? Icons.account_circle
-                                //   :
-                                Icons.account_circle_outlined),
-                            title: Text(
-                              // provider.currentUserId == users.uid
-                              //   ? "You"
-                              //   :
-                              users.name.toString(),
-                              style: const TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w600),
-                            ),
-                            subtitle: StreamBuilder<List<MessagesModel?>?>(
+                          child: StreamBuilder<List<MessagesModel?>?>(
                               stream: Provider.of<AuthProvider>(context,
                                       listen: false)
                                   .getMessages(
@@ -100,74 +84,143 @@ class UserList extends StatelessWidget {
                                               listen: false)
                                           .getLastMessageChatId(users.uid)),
                               builder: (context, snapshot1) {
-                                // if (snapshot1.connectionState ==
-                                //     ConnectionState.done) {
-                                if (snapshot1.data == null ||
-                                    snapshot1.data!.isEmpty) {
-                                  return Container();
-                                } else {
-                                  return StreamBuilder<Users?>(
-                                    stream: Provider.of<AuthProvider>(context,
-                                            listen: false)
-                                        .getUserDetalsWithId(
-                                            snapshot1.data!.first!.senderId),
-                                    builder: (context, snapshot2) {
-                                      if (snapshot2.data == null) {
-                                        return Container();
-                                      } else {
-                                        var messageData =
-                                            snapshot1.data!.first!;
-                                        return Text(
-                                            "${messageData.senderId == Provider.of<AuthProvider>(context).currentUserId ? "Sent by You" : snapshot2.data!.phoneNumber}: ${getFileType(messageData)}",
-                                            style:
-                                                const TextStyle(fontSize: 13));
-                                      }
-                                    },
-                                  );
-                                }
-                                // }
-                                // // else if (snapshot1.connectionState ==
-                                // //     ConnectionState.waiting) {
-                                // //   return Text('Error'); // error
-                                // // }
-                                // else {
-                                //   return CircularProgressIndicator(); // loading
-                                // }
-                              },
-                            ),
-                            // StreamProvider(
-                            //   create: (BuildContext context) =>
-                            //       Provider.of<AuthProvider>(context,
-                            //               listen: false)
-                            //           .getMessages(
-                            //               chatId: Provider.of<AuthProvider>(
-                            //                       context,
-                            //                       listen: false)
-                            //                   .getLastMessageChatId(users.uid)),
-                            //   initialData: null,
-                            //   child: StreamProvider(
-                            //     create: (BuildContext context) => Provider.of<
-                            //             AuthProvider>(context, listen: false)
-                            //         .getUserDetalsWithId(
-                            //             Provider.of<Iterable<MessagesModel?>?>(
-                            //                         context,
-                            //                         listen: false)!
-                            //                     .first!
-                            //                     .senderId !=
-                            //                 null),
-                            //     initialData: null,
-                            //     child: const LastMesseWidget(),
-                            //   ),
-                            // ),
-                            onTap: () {
-                              // if (provider.currentUserId == users.uid) {
-                              //   buildShowSnackBar(context,
-                              //       "You can't send message to yourself");
-                              // } else {
-                              provider.usersClickListener(users, context);
-                              // }
-                            },
-                          ),
+                                return ListTile(
+                                  // dense: true,
+                                  tileColor: Colors.teal.shade50,
+                                  leading: const Icon(
+                                      // provider.currentUserId == users.uid
+                                      //   ? Icons.account_circle
+                                      //   :
+                                      Icons.account_circle_outlined),
+                                  title: Text(
+                                    // provider.currentUserId == users.uid
+                                    //   ? "You"
+                                    //   :
+                                    users.name.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  subtitle:
+                                      // if (snapshot1.connectionState ==
+                                      //     ConnectionState.done) {
+                                      snapshot1.data == null ||
+                                              snapshot1.data!.isEmpty
+                                          ? Container()
+                                          :
+                                          // } else {
+                                          //   return
+                                          StreamBuilder<Users?>(
+                                              stream: Provider.of<AuthProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .getUserDetalsWithId(snapshot1
+                                                      .data!.first!.senderId),
+                                              builder: (context, snapshot2) {
+                                                if (snapshot2.data == null) {
+                                                  return Container();
+                                                } else {
+                                                  var messageData =
+                                                      snapshot1.data!.first!;
+                                                  return Text(
+                                                      "${messageData.senderId == Provider.of<AuthProvider>(context).currentUserId ? "Sent by You" : snapshot2.data!.phoneNumber}: ${getFileType(messageData)}",
+                                                      style: const TextStyle(
+                                                          fontSize: 13));
+                                                }
+                                              },
+                                            ),
+
+                                  trailing: snapshot1.data == null ||
+                                          snapshot1.data!.isEmpty
+                                      ? Container(width: 0)
+                                      : users.uid ==
+                                                  snapshot1.data!.first!
+                                                      .receiverId ||
+                                              snapshot1.data!
+                                                  .where(
+                                                      (i) => i!.isRead == false)
+                                                  .isEmpty
+                                          ? Container(width: 0)
+                                          : Card(
+                                              elevation: 1,
+                                              color: Colors.teal,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20.0),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 2,
+                                                        horizontal: 6),
+                                                child: Text(
+                                                  snapshot1.data!
+                                                      .where((i) =>
+                                                          i!.isRead == false)
+                                                      .length
+                                                      .toString(),
+                                                  // snapshot1.data!.contains(element).length.toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ),
+                                  // }
+
+                                  // trailing: StreamBuilder<List<MessagesModel?>?>(
+                                  //   stream: Provider.of<AuthProvider>(context,
+                                  //           listen: false)
+                                  //       .getMessages(
+                                  //           chatId: Provider.of<AuthProvider>(context,
+                                  //                   listen: false)
+                                  //               .getLastMessageChatId(users.uid)),
+                                  //   builder: (context, snapshot1) {
+                                  //     // if (snapshot1.connectionState ==
+                                  //     //     ConnectionState.done) {
+                                  //     if (snapshot1.data == null ||
+                                  //         snapshot1.data!.isEmpty) {
+                                  //       return Container();
+                                  //     } else {
+                                  //       return Text("${snapshot1.data!.length}",
+                                  //           style: const TextStyle(fontSize: 13));
+                                  //     }
+                                  //   },
+                                  // ),
+
+                                  // StreamProvider(
+                                  //   create: (BuildContext context) =>
+                                  //       Provider.of<AuthProvider>(context,
+                                  //               listen: false)
+                                  //           .getMessages(
+                                  //               chatId: Provider.of<AuthProvider>(
+                                  //                       context,
+                                  //                       listen: false)
+                                  //                   .getLastMessageChatId(users.uid)),
+                                  //   initialData: null,
+                                  //   child: StreamProvider(
+                                  //     create: (BuildContext context) => Provider.of<
+                                  //             AuthProvider>(context, listen: false)
+                                  //         .getUserDetalsWithId(
+                                  //             Provider.of<Iterable<MessagesModel?>?>(
+                                  //                         context,
+                                  //                         listen: false)!
+                                  //                     .first!
+                                  //                     .senderId !=
+                                  //                 null),
+                                  //     initialData: null,
+                                  //     child: const LastMesseWidget(),
+                                  //   ),
+                                  // ),
+                                  onTap: () {
+                                    // if (provider.currentUserId == users.uid) {
+                                    //   buildShowSnackBar(context,
+                                    //       "You can't send message to yourself");
+                                    // } else {
+                                    provider.usersClickListener(users, context);
+                                    // }
+                                  },
+                                );
+                              }),
                         );
                 });
   }
@@ -175,7 +228,7 @@ class UserList extends StatelessWidget {
   String getFileType(MessagesModel messageType) {
     switch (messageType.msgType) {
       case 'text':
-        return messageType.message!;
+        return messageType.message.toString();
       case 'image':
         return '📷 Photo';
       case 'voice message':

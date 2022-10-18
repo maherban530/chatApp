@@ -1,23 +1,28 @@
 import 'dart:async';
 import 'package:chat_app/Widgets/audio_file.dart';
+import 'package:chat_app/Widgets/messages.dart';
 import 'package:chewie/chewie.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:intl/intl.dart';
 
+import '../Models/messages_model.dart';
 import 'Audio Component/audio_player.dart';
 import 'package:just_audio/just_audio.dart' as ap;
 
 import 'Video Component/video_player.dart';
 
 class SenderMessageCard extends StatefulWidget {
-  const SenderMessageCard(this.fileName, this.msgType, this.msg, this.time,
+  const SenderMessageCard(this.messageList,
+      // this.fileName, this.msgType, this.msg, this.time,
       {Key? key})
       : super(key: key);
-
-  final String msg;
-  final String time;
-  final String msgType;
-  final String fileName;
+  final MessagesModel messageList;
+  // final String msg;
+  // final String time;
+  // final String msgType;
+  // final String fileName;
 
   @override
   State<SenderMessageCard> createState() => _SenderMessageCardState();
@@ -29,12 +34,12 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
   // int? bufferDelay;
   Widget messageBuilder(context) {
     Widget body = Container();
-    if (widget.msgType == "image") {
+    if (widget.messageList.msgType == "image") {
       body = Padding(
         padding: const EdgeInsets.all(5),
         child: ConstrainedBox(
           constraints: const BoxConstraints(
-            maxHeight: 300,
+            // maxHeight: 300,
             // minHeight: 200,
             maxWidth: 290,
             // minWidth: 200
@@ -54,7 +59,7 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
                           placeholder: 'assets/images/Fading lines.gif',
                           placeholderCacheHeight: 50,
                           placeholderCacheWidth: 50,
-                          image: widget.msg,
+                          image: widget.messageList.message.toString(),
                         ),
                       ),
                     );
@@ -69,13 +74,13 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
                 placeholder: 'assets/images/Fading lines.gif',
                 placeholderCacheHeight: 50,
                 placeholderCacheWidth: 50,
-                image: widget.msg,
+                image: widget.messageList.message.toString(),
               ),
             ),
           ),
         ),
       );
-    } else if (widget.msgType == "text") {
+    } else if (widget.messageList.msgType == "text") {
       body = Padding(
         padding: const EdgeInsets.only(left: 10, right: 20, top: 5, bottom: 5),
         child: ConstrainedBox(
@@ -86,18 +91,20 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
             // minWidth: 200
           ),
           child: SelectableText(
-            widget.msg,
+            widget.messageList.message.toString(),
             style: const TextStyle(fontSize: 16, color: Colors.white),
           ),
         ),
       );
-    } else if (widget.msgType == "video") {
+    } else if (widget.messageList.msgType == "video") {
       body = InkWell(
         onTap: () {
           showDialog(
             context: context,
             builder: (context) {
-              return VideoViewPage(path: widget.msg);
+              return VideoViewPage(
+                path: widget.messageList.message.toString(),
+              );
             },
           );
         },
@@ -140,22 +147,23 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
           ),
         ),
       );
-    } else if (widget.msgType == "document") {
+    } else if (widget.messageList.msgType == "document") {
       body = body = Padding(
         padding: const EdgeInsets.only(left: 10, right: 20, top: 5, bottom: 5),
         child: SelectableText(
-          widget.fileName,
+          widget.messageList.fileName,
           style: const TextStyle(fontSize: 16, color: Colors.white),
         ),
       );
-    } else if (widget.msgType == "audio") {
+    } else if (widget.messageList.msgType == "audio") {
       body = body = SizedBox(
         width: MediaQuery.of(context).size.width * .7,
         child: Padding(
           padding:
               const EdgeInsets.only(left: 10, right: 20, top: 5, bottom: 5),
           child: AudioPlayer(
-            source: ap.AudioSource.uri(Uri.parse(widget.msg)),
+            source: ap.AudioSource.uri(
+                Uri.parse(widget.messageList.message.toString())),
             // onDelete: () {
             //   setState(() => showPlayer = false);
             // },
@@ -163,14 +171,15 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
           // VoiceMessage(voiceUrl: widget.msg, voiceName: widget.fileName),
         ),
       );
-    } else if (widget.msgType == "voice message") {
+    } else if (widget.messageList.msgType == "voice message") {
       body = SizedBox(
         width: MediaQuery.of(context).size.width * .7,
         child: Padding(
           padding:
               const EdgeInsets.only(left: 10, right: 20, top: 5, bottom: 5),
           child: AudioPlayer(
-            source: ap.AudioSource.uri(Uri.parse(widget.msg)),
+            source: ap.AudioSource.uri(
+                Uri.parse(widget.messageList.message.toString())),
             // onDelete: () {
             //   setState(() => showPlayer = false);
             // },
@@ -234,9 +243,33 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
             messageBuilder(context),
             Padding(
               padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-              child: Text(widget.time,
-                  style: const TextStyle(fontSize: 13, color: Colors.white)),
-            )
+              child: Wrap(
+                children: [
+                  Text(
+                      widget.messageList.msgTime == null
+                          ? DateFormat('dd-MM-yyyy hh:mm a').format(
+                              DateTime.parse(
+                                  Timestamp.now().toDate().toString()))
+                          : DateFormat('dd-MM-yyyy hh:mm a').format(
+                              DateTime.parse(widget.messageList.msgTime!
+                                  .toDate()
+                                  .toString())),
+                      style:
+                          const TextStyle(fontSize: 13, color: Colors.white)),
+                  widget.messageList.isRead!
+                      ? const Icon(
+                          Icons.done_all,
+                          color: Colors.white,
+                          size: 14,
+                        )
+                      : const Icon(
+                          Icons.done,
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                ],
+              ),
+            ),
           ]),
         ));
   }
