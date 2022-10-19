@@ -87,19 +87,44 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
     ThemeData applicationTheme = Theme.of(context);
 
     return Scaffold(
-        backgroundColor: applicationTheme.backgroundColor,
+        // backgroundColor: applicationTheme.backgroundColor,
         appBar: AppBar(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          leadingWidth: 20,
+          title: Row(
             children: [
-              Text(
-                  Provider.of<AuthProvider>(context, listen: false)
+              Provider.of<AuthProvider>(context, listen: false)
                       .peerUserData!
-                      .name
-                      .toString(),
-                  style: const TextStyle(
-                      fontSize: 18.5, fontWeight: FontWeight.bold)),
-              const LastSeenChat(),
+                      .userPic!
+                      .isEmpty
+                  ? CircleAvatar(
+                      radius: 22,
+                      backgroundColor: applicationTheme.primaryColor,
+                      backgroundImage:
+                          const AssetImage("assets/images/avatar.png"),
+                    )
+                  : CircleAvatar(
+                      radius: 22,
+                      backgroundColor: applicationTheme.primaryColor,
+                      backgroundImage: NetworkImage(
+                          Provider.of<AuthProvider>(context, listen: false)
+                              .peerUserData!
+                              .userPic
+                              .toString()),
+                    ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                      Provider.of<AuthProvider>(context, listen: false)
+                          .peerUserData!
+                          .name
+                          .toString(),
+                      style: const TextStyle(
+                          fontSize: 18.5, fontWeight: FontWeight.bold)),
+                  const LastSeenChat(),
+                ],
+              ),
             ],
           ),
           actions: [

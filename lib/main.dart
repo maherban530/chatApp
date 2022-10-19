@@ -1,3 +1,4 @@
+import 'package:chat_app/Provider/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -22,14 +23,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: providersCollection,
-      child: MaterialApp(
-        title: 'ChatApp',
-        theme: ChatAppTheme.lightTheme,
-        darkTheme: ChatAppTheme.darkTheme,
-        debugShowCheckedModeBanner: false,
-        initialRoute: AppRoutes.splash,
-        routes: routes.route,
-      ),
+      child: Builder(builder: (context) {
+        final theamChanger = Provider.of<ThemeChanger>(context);
+        return MaterialApp(
+          title: 'ChatApp',
+          themeMode: theamChanger.theamMode,
+          theme: ChatAppTheme.lightTheme,
+          darkTheme: ChatAppTheme.darkTheme,
+          debugShowCheckedModeBanner: false,
+          initialRoute: AppRoutes.splash,
+          routes: routes.route,
+        );
+      }),
     );
   }
 }

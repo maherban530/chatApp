@@ -30,7 +30,7 @@ class MessagesModel {
     msgTime = json['msgTime'];
     msgType = json['msgType'] ?? '';
     message = json['message'] ?? '';
-    isRead = json['isRead'];
+    isRead = json['isRead'] ?? false;
     fileName = json['fileName'] ?? '';
     docId = json['docId'] ?? '';
   }
