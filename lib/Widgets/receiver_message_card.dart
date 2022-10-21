@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../Core/theme.dart';
 import '../Models/messages_model.dart';
+import '../Utils/constants.dart';
 import 'Audio Component/audio_player.dart';
 import 'package:just_audio/just_audio.dart' as ap;
 
@@ -26,6 +28,8 @@ class _ReceiverMessageCardState extends State<ReceiverMessageCard> {
   // int? bufferDelay;
 
   Widget messageBuilder(context) {
+    ThemeData applicationTheme = Theme.of(context);
+
     Widget body = Container();
     if (widget.messageList.msgType == "image") {
       body = Padding(
@@ -80,13 +84,11 @@ class _ReceiverMessageCardState extends State<ReceiverMessageCard> {
             // maxHeight: 300,
             // minHeight: 200,
             maxWidth: 280,
-            // minWidth: 200
+            minWidth: 50,
           ),
           child: SelectableText(
             widget.messageList.message.toString(),
-            style: const TextStyle(
-              fontSize: 16,
-            ),
+            style: applicationTheme.textTheme.bodyText2,
           ),
         ),
       );
@@ -217,28 +219,33 @@ class _ReceiverMessageCardState extends State<ReceiverMessageCard> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData applicationTheme = Theme.of(context);
+
     return Align(
         alignment: Alignment.centerLeft,
         child: Card(
-          color: Colors.white30,
+          color: applicationTheme.cardColor,
           elevation: 1,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           // color: Colors.purple[200],
           margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            messageBuilder(context),
-            Padding(
-              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-              child: Text(
-                  widget.messageList.msgTime == null
-                      ? DateFormat('dd-MM-yyyy hh:mm a').format(
-                          DateTime.parse(Timestamp.now().toDate().toString()))
-                      : DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.parse(
-                          widget.messageList.msgTime!.toDate().toString())),
-                  style: const TextStyle(fontSize: 13, color: Colors.white)),
-            )
-          ]),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              messageBuilder(context),
+              Padding(
+                padding: const EdgeInsets.all(2),
+                child: Text(
+                    widget.messageList.msgTime == null
+                        ? DateFormat('hh:mm a').format(
+                            DateTime.parse(Timestamp.now().toDate().toString()))
+                        : DateFormat('hh:mm a').format(DateTime.parse(
+                            widget.messageList.msgTime!.toDate().toString())),
+                    style: applicationTheme.textTheme.subtitle1),
+              )
+            ],
+          ),
         ));
   }
 }

@@ -17,7 +17,7 @@ class Users {
       this.userStatus});
 
   Users.fromJson(Map<String, dynamic> json) {
-    uid = json['uid'] ?? '';
+    uid = json['uid'];
     name = json['name'] ?? '';
     phoneNumber = json['phoneNumber'] ?? '';
     email = json['email'] ?? '';

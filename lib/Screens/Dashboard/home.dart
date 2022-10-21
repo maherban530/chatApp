@@ -1,12 +1,13 @@
-import 'package:chat_app/Core/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../Core/route_path.dart';
+import '../../Core/theme.dart';
 import '../../Models/messages_model.dart';
 import '../../Models/user_model.dart';
 import '../../Provider/auth_provider.dart';
 import '../../Provider/theme_provider.dart';
+import '../../Utils/constants.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -24,21 +25,23 @@ class _HomeState extends State<Home> {
       // backgroundColor: applicationTheme.backgroundColor,
       appBar: AppBar(
         // backgroundColor: ApplicationColors.yellowColor,
+        title: Text(
+          'Chat App',
+          style: applicationTheme.textTheme.bodyText1!
+              .copyWith(color: Colors.white),
+        ),
         actions: [
-          TextButton.icon(
+          IconButton(
             // style: applicationTheme.textButtonTheme.style,
             onPressed: () {
               _showDialog(context);
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.lightbulb,
-              color: applicationTheme.iconTheme.color,
+              color: ApplicationColors.backgroundLight,
             ),
-            label: Text("Theme Change",
-                style: applicationTheme.textTheme.headline3),
           ),
-          TextButton.icon(
-            // style: applicationTheme.textButtonTheme.style,
+          IconButton(
             onPressed: () {
               final provider =
                   Provider.of<AuthProvider>(context, listen: false);
@@ -48,11 +51,10 @@ class _HomeState extends State<Home> {
                 AppRoutes.signup,
               );
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.logout,
-              color: applicationTheme.iconTheme.color,
+              color: ApplicationColors.backgroundLight,
             ),
-            label: Text("LogOut", style: applicationTheme.textTheme.headline3),
           ),
         ],
       ),
@@ -117,24 +119,24 @@ class UserList extends StatelessWidget {
                                 child: Row(
                                   children: [
                                     users.userPic!.isEmpty
-                                        ? CircleAvatar(
+                                        ? const CircleAvatar(
                                             radius: 26,
-                                            backgroundColor:
-                                                applicationTheme.primaryColor,
-                                            backgroundImage: const AssetImage(
+                                            backgroundColor: ApplicationColors
+                                                .transparentColor,
+                                            backgroundImage: AssetImage(
                                                 "assets/images/avatar.png"),
                                           )
                                         : CircleAvatar(
                                             radius: 26,
-                                            backgroundColor:
-                                                applicationTheme.primaryColor,
+                                            backgroundColor: ApplicationColors
+                                                .transparentColor,
                                             backgroundImage: NetworkImage(
                                                 users.userPic.toString()),
                                           ),
                                     Expanded(
                                       child: Padding(
                                         padding: const EdgeInsets.only(
-                                            left: 8.0, right: 2.0),
+                                            left: 10.0, right: 2.0),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -145,7 +147,7 @@ class UserList extends StatelessWidget {
                                                 overflow: TextOverflow.ellipsis,
                                                 style: applicationTheme
                                                     .textTheme.bodyText2),
-                                            const SizedBox(height: 8),
+                                            const SizedBox(height: 5),
                                             //       // if (snapshot1.connectionState ==
                                             //     ConnectionState.done) {
                                             snapshot1.data == null ||
@@ -184,19 +186,24 @@ class UserList extends StatelessWidget {
                                                                         .currentUserId
                                                                 ? messageData
                                                                         .isRead!
-                                                                    ? const Icon(
+                                                                    ? Icon(
                                                                         Icons
-                                                                            .done_all,
-                                                                        color: Colors
-                                                                            .teal,
-                                                                        // size: 14,
+                                                                            .done_all_rounded,
+                                                                        color: applicationTheme
+                                                                            .primaryColor,
+                                                                        size:
+                                                                            14,
                                                                       )
-                                                                    : const Icon(
+                                                                    : Icon(
                                                                         Icons
-                                                                            .done,
-                                                                        color: Colors
-                                                                            .teal,
-                                                                        // size: 14,
+                                                                            .done_rounded,
+                                                                        color: applicationTheme
+                                                                            .textTheme
+                                                                            .subtitle1!
+                                                                            .color!
+                                                                            .withOpacity(0.6),
+                                                                        size:
+                                                                            14,
                                                                       )
                                                                 : Container(),
                                                             Flexible(
@@ -240,7 +247,7 @@ class UserList extends StatelessWidget {
                                                 radius: 14,
                                                 backgroundColor:
                                                     applicationTheme
-                                                        .primaryColorLight,
+                                                        .primaryColor,
                                                 child: FittedBox(
                                                     fit: BoxFit.cover,
                                                     child: Padding(
@@ -258,8 +265,8 @@ class UserList extends StatelessWidget {
                                                             .textTheme
                                                             .subtitle1!
                                                             .copyWith(
-                                                                color: applicationTheme
-                                                                    .primaryColorDark),
+                                                                color: ApplicationColors
+                                                                    .backgroundLight),
                                                       ),
                                                     )),
                                               ),
@@ -510,8 +517,7 @@ void _showDialog(BuildContext context) {
                   Navigator.of(context).pop();
                 },
                 splashRadius: 20,
-                icon: Icon(Icons.close,
-                    color: applicationTheme.primaryColorLight),
+                icon: Icon(Icons.close, color: applicationTheme.primaryColor),
               ),
             ),
             Row(
@@ -519,7 +525,7 @@ void _showDialog(BuildContext context) {
               children: [
                 Text(
                   "Select Theme",
-                  style: applicationTheme.textTheme.bodyText2,
+                  style: applicationTheme.textTheme.bodyText1,
                 ),
               ],
             ),
@@ -532,7 +538,7 @@ void _showDialog(BuildContext context) {
             RadioListTile<ThemeMode>(
               title: Text("System Theme",
                   style: applicationTheme.textTheme.subtitle1),
-              activeColor: applicationTheme.primaryColorLight,
+              activeColor: applicationTheme.primaryColor,
               value: ThemeMode.system,
               groupValue: theamChanger.theamMode,
               onChanged: theamChanger.setTheme,
@@ -542,7 +548,7 @@ void _showDialog(BuildContext context) {
                 "Light Theme",
                 style: applicationTheme.textTheme.subtitle1,
               ),
-              activeColor: applicationTheme.primaryColorLight,
+              activeColor: applicationTheme.primaryColor,
               value: ThemeMode.light,
               groupValue: theamChanger.theamMode,
               onChanged: theamChanger.setTheme,
@@ -552,7 +558,7 @@ void _showDialog(BuildContext context) {
                 "Dark Theme",
                 style: applicationTheme.textTheme.subtitle1,
               ),
-              activeColor: applicationTheme.primaryColorLight,
+              activeColor: applicationTheme.primaryColor,
               value: ThemeMode.dark,
               groupValue: theamChanger.theamMode,
               onChanged: theamChanger.setTheme,

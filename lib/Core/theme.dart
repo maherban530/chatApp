@@ -22,15 +22,20 @@ class ApplicationSizes {
 }
 
 class ApplicationColors {
-  static const Color primaryColorLight = Color.fromARGB(255, 19, 102, 94);
-  static const Color primaryColorDark = Color.fromARGB(255, 7, 31, 33);
+  static const Color primaryColorLight = Color(0xFFFB5F6B);
+  static const Color primaryColorDark = Color(0xFFFB5F6B);
 
   static const Color accentColorLight = Color.fromARGB(255, 19, 102, 94);
   static const Color accentColorDark = Color.fromARGB(255, 7, 31, 33);
 
   static const Color backgroundLight = Color(0xFFF4F4F4);
-  static const Color backgroundDark = Color.fromARGB(255, 10, 40, 44);
+  static const Color backgroundDark = Color(0xFF071330);
+  static const Color backgroundSimpleDark = Color(0xFF040a1a);
+
   static const Color gray = Color(0xFF999999);
+  // static const Color sendCardColor = Color.fromARGB(255, 166, 228, 213);
+  static Color reciverCardColor = Colors.blueGrey.shade900;
+  // static const Color blackText = Colors.black;
 
   static const Color primaryTextColorLight = Color(0xFF282828);
   static const Color primaryTextColorDark = Color(0xFFFFFFFF);
@@ -46,102 +51,108 @@ class ApplicationColors {
 class ChatAppTheme {
   static get lightTheme {
     final themeData = ThemeData.light();
-    final originalTextTheme = themeData.textTheme.copyWith(
-        headline4:
-            const TextStyle(color: ApplicationColors.primaryTextColorLight));
+    // final originalTextTheme = themeData.textTheme.copyWith(
+    //     headline4:
+    //         const TextStyle(color: ApplicationColors.primaryTextColorLight));
     return themeData.copyWith(
+        brightness: Brightness.light,
         primaryColor: ApplicationColors.primaryColorLight,
-        scaffoldBackgroundColor: ApplicationColors.backgroundLight,
-        backgroundColor: ApplicationColors.backgroundLight,
-        primaryColorLight: ApplicationColors.backgroundDark,
-        primaryColorDark: ApplicationColors.backgroundLight,
-        dividerColor: ApplicationColors.gray,
+        backgroundColor: ApplicationColors.transparentColor,
+        // backgroundColor: ApplicationColors.backgroundLight,
+        // primaryColorLight: ApplicationColors.backgroundDark,
+        // primaryColorDark: ApplicationColors.backgroundLight,
+        // dividerColor: ApplicationColors.gray,
+        scaffoldBackgroundColor: Colors.grey.shade300,
         appBarTheme:
             const AppBarTheme(color: ApplicationColors.primaryColorLight),
+        cardColor: ApplicationColors.backgroundLight,
         iconTheme: const IconThemeData(
-            color: ApplicationColors.backgroundLight, size: 16),
-        textTheme: originalTextTheme.copyWith(
+            color: ApplicationColors.backgroundLight, size: 20),
+        textTheme: themeData.textTheme.copyWith(
           bodyText1: const TextStyle(
               color: ApplicationColors.primaryTextColorLight,
-              fontSize: 28,
+              fontSize: 18,
               fontFamily: 'Maccabi',
               fontWeight: FontWeight.w700),
           bodyText2: const TextStyle(
               color: ApplicationColors.primaryTextColorLight,
               fontSize: 16,
               fontFamily: 'Maccabi',
-              fontWeight: FontWeight.w700),
+              fontWeight: FontWeight.w500),
           subtitle1: const TextStyle(
               color: ApplicationColors.primaryTextColorLight,
               fontSize: 14,
               fontFamily: 'Maccabi',
-              fontWeight: FontWeight.w400),
-          headline1: const TextStyle(
-              color: ApplicationColors.primaryTextColorDark,
-              fontSize: 28,
-              fontFamily: 'Maccabi',
-              fontWeight: FontWeight.w700),
-          headline2: const TextStyle(
-              color: ApplicationColors.primaryTextColorDark,
-              fontSize: 16,
-              fontFamily: 'Maccabi',
-              fontWeight: FontWeight.w700),
-          headline3: const TextStyle(
-              color: ApplicationColors.primaryTextColorDark,
-              fontSize: 14,
-              fontFamily: 'Maccabi',
-              fontWeight: FontWeight.w400),
+              fontWeight: FontWeight.w300),
+          // headline1: const TextStyle(
+          //     color: ApplicationColors.primaryTextColorDark,
+          //     fontSize: 28,
+          //     fontFamily: 'Maccabi',
+          //     fontWeight: FontWeight.w700),
+          // headline2: const TextStyle(
+          //     color: ApplicationColors.primaryTextColorDark,
+          //     fontSize: 16,
+          //     fontFamily: 'Maccabi',
+          //     fontWeight: FontWeight.w700),
+          // headline3: const TextStyle(
+          //     color: ApplicationColors.primaryTextColorDark,
+          //     fontSize: 14,
+          //     fontFamily: 'Maccabi',
+          //     fontWeight: FontWeight.w400),
         ));
   }
 
   static get darkTheme {
     final themeData = ThemeData.dark();
-    final originalTextTheme = themeData.textTheme.copyWith(
-        headline4:
-            const TextStyle(color: ApplicationColors.primaryTextColorDark));
+    // final originalTextTheme = themeData.textTheme.copyWith(
+    //     headline4:
+    //         const TextStyle(color: ApplicationColors.primaryTextColorDark));
     return themeData.copyWith(
+        brightness: Brightness.dark,
         primaryColor: ApplicationColors.primaryColorDark,
+        backgroundColor: ApplicationColors.transparentColor,
+        // backgroundColor: ApplicationColors.backgroundDark,
+        // primaryColorLight: ApplicationColors.backgroundLight,
+        // primaryColorDark: ApplicationColors.backgroundDark,
+        // dividerColor: ApplicationColors.gray,
         scaffoldBackgroundColor: ApplicationColors.backgroundDark,
-        backgroundColor: ApplicationColors.backgroundDark,
-        primaryColorLight: ApplicationColors.backgroundLight,
-        primaryColorDark: ApplicationColors.backgroundDark,
-        dividerColor: ApplicationColors.gray,
         appBarTheme:
-            const AppBarTheme(color: ApplicationColors.primaryColorDark),
+            const AppBarTheme(color: ApplicationColors.primaryColorLight),
+        cardColor: ApplicationColors.reciverCardColor,
         iconTheme: const IconThemeData(
-            color: ApplicationColors.backgroundLight, size: 16),
-        textTheme: originalTextTheme.copyWith(
+            color: ApplicationColors.backgroundLight, size: 20),
+        textTheme: themeData.textTheme.copyWith(
           bodyText1: const TextStyle(
               color: ApplicationColors.primaryTextColorDark,
-              fontSize: 28,
+              fontSize: 18,
               fontFamily: 'Maccabi',
               fontWeight: FontWeight.w700),
           bodyText2: const TextStyle(
               color: ApplicationColors.primaryTextColorDark,
               fontSize: 16,
               fontFamily: 'Maccabi',
-              fontWeight: FontWeight.w700),
+              fontWeight: FontWeight.w500),
           subtitle1: const TextStyle(
             color: ApplicationColors.primaryTextColorDark,
             fontSize: 14,
             fontFamily: 'Maccabi',
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w300,
           ),
-          headline1: const TextStyle(
-              color: ApplicationColors.primaryTextColorDark,
-              fontSize: 28,
-              fontFamily: 'Maccabi',
-              fontWeight: FontWeight.w700),
-          headline2: const TextStyle(
-              color: ApplicationColors.primaryTextColorDark,
-              fontSize: 16,
-              fontFamily: 'Maccabi',
-              fontWeight: FontWeight.w700),
-          headline3: const TextStyle(
-              color: ApplicationColors.primaryTextColorDark,
-              fontSize: 14,
-              fontFamily: 'Maccabi',
-              fontWeight: FontWeight.w400),
+          // headline1: const TextStyle(
+          //     color: ApplicationColors.primaryTextColorDark,
+          //     fontSize: 28,
+          //     fontFamily: 'Maccabi',
+          //     fontWeight: FontWeight.w700),
+          // headline2: const TextStyle(
+          //     color: ApplicationColors.primaryTextColorDark,
+          //     fontSize: 16,
+          //     fontFamily: 'Maccabi',
+          //     fontWeight: FontWeight.w700),
+          // headline3: const TextStyle(
+          //     color: ApplicationColors.primaryTextColorDark,
+          //     fontSize: 14,
+          //     fontFamily: 'Maccabi',
+          //     fontWeight: FontWeight.w400),
         ));
   }
 }

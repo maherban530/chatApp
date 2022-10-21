@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Constants {
   static const String USER_ID = "userId";
   static const String TITLE = "Magic Kass";
@@ -21,4 +23,11 @@ class ApplicationTexts {
   static const String emailIsEmpty = "Email is Empty";
   static const String password = "Password";
   static const String passwordIsEmpty = "Password is Empty";
+}
+
+class AppColors {
+  static const Color tealColor = Colors.teal;
+  static const Color whiteColor = Color(0xFFF4F4F4);
+  static const Color greyColor = Colors.grey;
+  static const Color blueColor = Colors.blue;
 }

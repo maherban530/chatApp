@@ -1,3 +1,4 @@
+import 'package:chat_app/Core/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../Models/user_model.dart';
 import '../Provider/auth_provider.dart';
+import '../Utils/constants.dart';
 
 class LastSeenChat extends StatefulWidget {
   const LastSeenChat({Key? key}) : super(key: key);
@@ -32,15 +34,23 @@ class LastSeenWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Users? userList = Provider.of<Users?>(context);
+    ThemeData applicationTheme = Theme.of(context);
 
     if (userList == null) {
       return Container();
     } else if (userList.userStatus is Timestamp) {
       return Text(
-          "last seen : ${Jiffy(DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.parse(userList.userStatus.toDate().toString())), "dd-MM-yyyy hh:mm a").fromNow()}",
-          style: const TextStyle(fontSize: 13));
+          Jiffy(
+                  DateFormat('dd-MM-yyyy hh:mm a').format(
+                      DateTime.parse(userList.userStatus.toDate().toString())),
+                  "dd-MM-yyyy hh:mm a")
+              .fromNow(),
+          style: applicationTheme.textTheme.subtitle1!
+              .copyWith(color: ApplicationColors.backgroundLight));
     } else {
-      return Text(userList.userStatus, style: const TextStyle(fontSize: 13));
+      return Text(userList.userStatus,
+          style: applicationTheme.textTheme.subtitle1!
+              .copyWith(color: ApplicationColors.backgroundLight));
     }
   }
 }

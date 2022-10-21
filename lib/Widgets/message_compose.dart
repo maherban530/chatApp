@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:chat_app/Core/theme.dart';
 import 'package:chat_app/Widgets/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_sound_record/flutter_sound_record.dart';
 // import 'package:full_chat_application/Utils.dart';
 // import 'package:full_chat_application/notifications/notifications.dart';
@@ -18,7 +18,6 @@ import 'package:provider/provider.dart';
 
 import '../Notifications/notification.dart';
 import '../Provider/auth_provider.dart';
-import 'Audio Component/audio_player.dart';
 // import '../provider/my_provider.dart';
 // import '../firebase_helper/fireBaseHelper.dart';
 import 'package:just_audio/just_audio.dart' as ap;
@@ -42,6 +41,7 @@ class _MessagesComposeState extends State<MessagesCompose>
 
   final FlutterSoundRecord _audioRecorder = FlutterSoundRecord();
   ap.AudioSource? audioSource;
+
   bool _isRecording = false;
   bool _isPaused = false;
   Timer? _timer;
@@ -89,6 +89,7 @@ class _MessagesComposeState extends State<MessagesCompose>
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<AuthProvider>(context, listen: false);
+    ThemeData applicationTheme = Theme.of(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,8 +97,26 @@ class _MessagesComposeState extends State<MessagesCompose>
         if (_isRecording == true) ...[
           // _buildRecordStopControl(),
           // const SizedBox(width: 20),
-          _buildPauseResumeControl(),
-          _buildText()
+          SizedBox(
+              width: MediaQuery.of(context).size.width - 55,
+              child: Card(
+                // color: applicationTheme.primaryColor,
+                margin: const EdgeInsets.only(left: 5, right: 5, bottom: 8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildCloseControl(),
+                      _buildPauseResumeControl(),
+                      _buildText()
+                    ],
+                  ),
+                ),
+              )),
+          //
         ],
         // AudioRecorder(
         //       onStop: (String path) {
@@ -145,14 +164,13 @@ class _MessagesComposeState extends State<MessagesCompose>
           SizedBox(
               width: MediaQuery.of(context).size.width - 55,
               child: Card(
-                color: Colors.blueAccent,
+                // color: applicationTheme.primaryColor,
                 margin: const EdgeInsets.only(left: 5, right: 5, bottom: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25)),
                 child: TextField(
-                    style: const TextStyle(
-                      color: Colors.white,
-                    ),
+                    style: applicationTheme.textTheme.bodyText2,
+                    cursorColor: applicationTheme.textTheme.bodyText2!.color,
                     controller: _textController,
                     textAlignVertical: TextAlignVertical.center,
                     keyboardType: TextInputType.multiline,
@@ -174,9 +192,7 @@ class _MessagesComposeState extends State<MessagesCompose>
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: "Type your message",
-                      hintStyle: const TextStyle(
-                        color: Colors.white,
-                      ),
+                      hintStyle: applicationTheme.textTheme.bodyText2,
                       contentPadding:
                           const EdgeInsets.only(left: 17, top: 5, bottom: 5),
                       suffixIcon: Row(
@@ -234,9 +250,10 @@ class _MessagesComposeState extends State<MessagesCompose>
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 10),
                               constraints: const BoxConstraints(),
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.attach_file,
-                                color: Colors.white,
+                                color:
+                                    applicationTheme.textTheme.bodyText2!.color,
                               )),
                           IconButton(
                             splashRadius: 20,
@@ -263,9 +280,10 @@ class _MessagesComposeState extends State<MessagesCompose>
                                 }
                               });
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.camera_alt,
-                              color: Colors.white,
+                              color:
+                                  applicationTheme.textTheme.bodyText2!.color,
                             ),
                           ),
                           const SizedBox(width: 5),
@@ -275,93 +293,96 @@ class _MessagesComposeState extends State<MessagesCompose>
               )),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 8.0, right: 2),
+            padding: const EdgeInsets.only(bottom: 8.0, right: 4),
             child: CircleAvatar(
               radius: 25,
-              backgroundColor: Colors.blueAccent,
+              backgroundColor: applicationTheme.primaryColor,
               child: IconButton(
-                  onPressed: () async {
-                    if (sendChatButton) {
-                      //txt message
-                      provider.sendMessage(
-                          chatId: provider.getChatId(),
-                          senderId: provider.currentUserId,
-                          receiverId: provider.peerUserData!.uid,
-                          msgTime: Timestamp.now(),
-                          // FieldValue.serverTimestamp(),
-                          msgType: "text",
-                          message: _textController.text.toString(),
-                          fileName: "");
+                splashRadius: 30,
+                icon: Icon(
+                  sendChatButton
+                      ? Icons.send
+                      : _isRecording == true
+                          ? Icons.stop
+                          : Icons.mic,
+                  color: Colors.white,
+                  size: 27,
+                ),
+                onPressed: () async {
+                  if (sendChatButton) {
+                    //txt message
+                    provider.sendMessage(
+                        chatId: provider.getChatId(),
+                        senderId: provider.currentUserId,
+                        receiverId: provider.peerUserData!.uid,
+                        msgTime: Timestamp.now(),
+                        // FieldValue.serverTimestamp(),
+                        msgType: "text",
+                        message: _textController.text.toString(),
+                        fileName: "");
 
-                      // provider.updateLastMessage(
-                      //     chatId: provider.getChatId(context),
-                      //     senderId: provider.currentUserId,
-                      //     receiverId: provider.peerUserData!.uid,
-                      //     receiverUsername: provider.peerUserData!.name,
-                      //     msgTime: FieldValue.serverTimestamp(),
-                      //     msgType: "text",
-                      //     message: _textController.text.toString(),
-                      //     context: context);
+                    // provider.updateLastMessage(
+                    //     chatId: provider.getChatId(context),
+                    //     senderId: provider.currentUserId,
+                    //     receiverId: provider.peerUserData!.uid,
+                    //     receiverUsername: provider.peerUserData!.name,
+                    //     msgTime: FieldValue.serverTimestamp(),
+                    //     msgType: "text",
+                    //     message: _textController.text.toString(),
+                    //     context: context);
 
-                      /////////////////////////////
+                    /////////////////////////////
 
-                      // provider.updateLastMessage(
-                      //     chatId: provider.getChatId(context),
-                      //     senderId: provider.currentUserId,
-                      //     receiverId: provider.peerUserData!.uid,
-                      //     receiverUsername: provider.peerUserData!.name,
-                      //     msgTime: FieldValue.serverTimestamp(),
-                      //     msgType: "text",
-                      //     message: _textController.text.toString(),
-                      //     context: context);
+                    // provider.updateLastMessage(
+                    //     chatId: provider.getChatId(context),
+                    //     senderId: provider.currentUserId,
+                    //     receiverId: provider.peerUserData!.uid,
+                    //     receiverUsername: provider.peerUserData!.name,
+                    //     msgTime: FieldValue.serverTimestamp(),
+                    //     msgType: "text",
+                    //     message: _textController.text.toString(),
+                    //     context: context);
 
-                      // notifyUser(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.displayName,
-                      //     _textController.text.toString(),
-                      //     Provider.of<MyProvider>(context,listen: false).peerUserData!["email"],
-                      //     Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email);
-                      _textController.clear();
-                      setState(() {
-                        sendChatButton = false;
-                      });
-                      provider.updateUserStatus("Online");
-                    } else {
-                      _isRecording ? _stop() : _start();
-                      // // final status =
-                      // await Permission.microphone.request().then((status) async {
-                      //   if (status == PermissionStatus.granted) {
-                      //     await initRecording();
-                      //     if (recorder.isRecording) {
-                      // await stop();
-                      //       setState(() {
-                      //         startVoiceMessage = false;
-                      //       });
-                      //     } else {
-                      //       await record();
-                      //       setState(() {
-                      //         startVoiceMessage = true;
-                      //       });
-                      //     }
-                      //   } else {
-                      //     buildShowSnackBar(
-                      //         context, "You must enable record permission");
-                      //   }
-                      // });
+                    // notifyUser(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.displayName,
+                    //     _textController.text.toString(),
+                    //     Provider.of<MyProvider>(context,listen: false).peerUserData!["email"],
+                    //     Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email);
+                    _textController.clear();
+                    setState(() {
+                      sendChatButton = false;
+                    });
+                    provider.updateUserStatus("Online");
+                  } else {
+                    _isRecording ? _stop() : _start();
+                    // // final status =
+                    // await Permission.microphone.request().then((status) async {
+                    //   if (status == PermissionStatus.granted) {
+                    //     await initRecording();
+                    //     if (recorder.isRecording) {
+                    // await stop();
+                    //       setState(() {
+                    //         startVoiceMessage = false;
+                    //       });
+                    //     } else {
+                    //       await record();
+                    //       setState(() {
+                    //         startVoiceMessage = true;
+                    //       });
+                    //     }
+                    //   } else {
+                    //     buildShowSnackBar(
+                    //         context, "You must enable record permission");
+                    //   }
+                    // });
 
-                      // voice message
+                    // voice message
 
-                    }
-                    // provider.scrollController.jumpTo(
-                    //   provider.scrollController.position.maxScrollExtent,
-                    // );
-                  },
-                  icon: Icon(
-                    sendChatButton
-                        ? Icons.send
-                        : _isRecording == true
-                            ? Icons.stop
-                            : Icons.mic,
-                    color: Colors.white,
-                  )),
+                  }
+                  // provider.scrollController.jumpTo(
+                  //   provider.scrollController.position.maxScrollExtent,
+                  // );
+                },
+              ),
             ),
           ),
         ),
@@ -396,6 +417,34 @@ class _MessagesComposeState extends State<MessagesCompose>
   //   );
   // }
 
+  Widget _buildCloseControl() {
+    ThemeData applicationTheme = Theme.of(context);
+
+    return ClipOval(
+      child: Material(
+        color: applicationTheme.textTheme.bodyText2!.color!.withOpacity(0.1),
+        child: InkWell(
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Icon(
+              Icons.close,
+              color: applicationTheme.textTheme.bodyText2!.color,
+              size: 27,
+            ),
+          ),
+          onTap: () async {
+            _timer?.cancel();
+            _ampTimer?.cancel();
+            setState(() {
+              _isPaused = false;
+              _isRecording = false;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _buildPauseResumeControl() {
     if (!_isRecording && !_isPaused) {
       return const SizedBox.shrink();
@@ -403,21 +452,26 @@ class _MessagesComposeState extends State<MessagesCompose>
 
     late Icon icon;
     late Color color;
+    ThemeData applicationTheme = Theme.of(context);
 
     if (!_isPaused) {
-      icon = const Icon(Icons.pause, color: Colors.red, size: 30);
-      color = Colors.red.withOpacity(0.1);
+      icon = Icon(Icons.pause,
+          color: applicationTheme.textTheme.bodyText2!.color, size: 28);
+      color = applicationTheme.textTheme.bodyText2!.color!.withOpacity(0.1);
     } else {
-      final ThemeData theme = Theme.of(context);
-      icon = const Icon(Icons.play_arrow, color: Colors.red, size: 30);
-      color = theme.primaryColor.withOpacity(0.1);
+      icon = Icon(Icons.play_arrow,
+          color: applicationTheme.textTheme.bodyText2!.color, size: 28);
+      color = applicationTheme.textTheme.bodyText2!.color!.withOpacity(0.1);
     }
 
     return ClipOval(
       child: Material(
         color: color,
         child: InkWell(
-          child: SizedBox(width: 56, height: 56, child: icon),
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: icon,
+          ),
           onTap: () {
             _isPaused ? _resume() : _pause();
           },

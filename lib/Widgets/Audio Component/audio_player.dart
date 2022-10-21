@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chat_app/Core/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart' as ap;
@@ -76,6 +77,7 @@ class AudioPlayerState extends State<AudioPlayer> {
   Widget build(BuildContext context) {
     final Duration position = _audioPlayer.position;
     final Duration? duration = _audioPlayer.duration;
+    ThemeData applicationTheme = Theme.of(context);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,6 +102,7 @@ class AudioPlayerState extends State<AudioPlayer> {
             // ),
           ],
         ),
+        const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -108,11 +111,11 @@ class AudioPlayerState extends State<AudioPlayer> {
             //     right: MediaQuery.of(context).size.width * .3, left: 14),
             // child:
             Text(position.toString().split(".")[0],
-                style: const TextStyle(color: Colors.white)),
+                style: applicationTheme.textTheme.subtitle1),
             // ),
             if (duration != null)
               Text(duration.toString().split(".")[0],
-                  style: const TextStyle(color: Colors.white))
+                  style: applicationTheme.textTheme.subtitle1)
           ],
         ),
       ],
@@ -124,12 +127,16 @@ class AudioPlayerState extends State<AudioPlayer> {
     Color color;
 
     if (_audioPlayer.playerState.playing) {
-      icon = const Icon(Icons.pause, color: Colors.red, size: 34);
-      color = Colors.red.withOpacity(0.1);
+      final ThemeData theme = Theme.of(context);
+
+      icon =
+          Icon(Icons.pause, color: theme.textTheme.bodyText2!.color, size: 32);
+      color = theme.textTheme.bodyText2!.color!.withOpacity(0.2);
     } else {
       final ThemeData theme = Theme.of(context);
-      icon = const Icon(Icons.play_arrow, color: Colors.white, size: 34);
-      color = theme.primaryColor.withOpacity(0.1);
+      icon = Icon(Icons.play_arrow,
+          color: theme.textTheme.bodyText2!.color, size: 32);
+      color = theme.textTheme.bodyText2!.color!.withOpacity(0.1);
     }
 
     return ClipOval(
@@ -168,7 +175,7 @@ class AudioPlayerState extends State<AudioPlayer> {
         overlayShape: RoundSliderOverlayShape(overlayRadius: 16.0),
       ),
       child: Slider(
-        activeColor: Theme.of(context).cardColor,
+        activeColor: Theme.of(context).scaffoldBackgroundColor,
         inactiveColor: Theme.of(context).disabledColor,
         onChanged: (double v) {
           if (duration != null) {

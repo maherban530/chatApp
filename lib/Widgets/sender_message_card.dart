@@ -1,7 +1,9 @@
+import 'package:chat_app/Utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../Core/theme.dart';
 import '../Models/messages_model.dart';
 import 'Audio Component/audio_player.dart';
 import 'package:just_audio/just_audio.dart' as ap;
@@ -9,15 +11,8 @@ import 'package:just_audio/just_audio.dart' as ap;
 import 'Video Component/video_player.dart';
 
 class SenderMessageCard extends StatefulWidget {
-  const SenderMessageCard(this.messageList,
-      // this.fileName, this.msgType, this.msg, this.time,
-      {Key? key})
-      : super(key: key);
+  const SenderMessageCard(this.messageList, {Key? key}) : super(key: key);
   final MessagesModel messageList;
-  // final String msg;
-  // final String time;
-  // final String msgType;
-  // final String fileName;
 
   @override
   State<SenderMessageCard> createState() => _SenderMessageCardState();
@@ -28,6 +23,8 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
   // ChewieController? _chewieController;
   // int? bufferDelay;
   Widget messageBuilder(context) {
+    ThemeData applicationTheme = Theme.of(context);
+
     Widget body = Container();
     if (widget.messageList.msgType == "image") {
       body = Padding(
@@ -83,11 +80,12 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
             // maxHeight: 300,
             // minHeight: 200,
             maxWidth: 280,
-            // minWidth: 200
+            minWidth: 60,
           ),
           child: SelectableText(
             widget.messageList.message.toString(),
-            style: const TextStyle(fontSize: 16, color: Colors.white),
+            style: applicationTheme.textTheme.bodyText2!
+                .copyWith(color: AppColors.whiteColor),
           ),
         ),
       );
@@ -227,46 +225,51 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData applicationTheme = Theme.of(context);
+
     return Align(
         alignment: Alignment.centerRight,
         child: Card(
           elevation: 1,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          color: Colors.blue,
+          color: applicationTheme.primaryColor,
           margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            messageBuilder(context),
-            Padding(
-              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.end,
-                children: [
-                  Text(
-                      widget.messageList.msgTime == null
-                          ? DateFormat('dd-MM-yyyy hh:mm a').format(
-                              DateTime.parse(
-                                  Timestamp.now().toDate().toString()))
-                          : DateFormat('dd-MM-yyyy hh:mm a').format(
-                              DateTime.parse(widget.messageList.msgTime!
-                                  .toDate()
-                                  .toString())),
-                      style:
-                          const TextStyle(fontSize: 13, color: Colors.white)),
-                  widget.messageList.isRead!
-                      ? const Icon(
-                          Icons.done_all,
-                          color: Colors.white,
-                          size: 14,
-                        )
-                      : const Icon(
-                          Icons.done,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              messageBuilder(context),
+              Padding(
+                padding: const EdgeInsets.all(2),
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.end,
+                  children: [
+                    Text(
+                        widget.messageList.msgTime == null
+                            ? DateFormat('hh:mm a').format(DateTime.parse(
+                                Timestamp.now().toDate().toString()))
+                            : DateFormat('hh:mm a').format(DateTime.parse(widget
+                                .messageList.msgTime!
+                                .toDate()
+                                .toString())),
+                        style: applicationTheme.textTheme.subtitle1!.copyWith(
+                            color: ApplicationColors.backgroundLight)),
+                    widget.messageList.isRead!
+                        ? const Icon(
+                            Icons.done_all_rounded,
+                            color: ApplicationColors.backgroundDark,
+                            size: 14,
+                          )
+                        : const Icon(
+                            Icons.done_rounded,
+                            color: ApplicationColors.backgroundLight,
+                            size: 14,
+                          ),
+                  ],
+                ),
               ),
-            ),
-          ]),
+            ],
+          ),
         ));
   }
 }

@@ -1,9 +1,9 @@
 import 'package:chat_app/Provider/auth_provider.dart';
+import 'package:chat_app/Utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../Models/messages_model.dart';
 import '../../Widgets/last_seen_chat.dart';
 import '../../Widgets/message_compose.dart';
 import '../../Widgets/messages.dart';
@@ -87,79 +87,82 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
     ThemeData applicationTheme = Theme.of(context);
 
     return Scaffold(
-        // backgroundColor: applicationTheme.backgroundColor,
-        appBar: AppBar(
-          leadingWidth: 20,
-          title: Row(
-            children: [
-              Provider.of<AuthProvider>(context, listen: false)
-                      .peerUserData!
-                      .userPic!
-                      .isEmpty
-                  ? CircleAvatar(
-                      radius: 22,
-                      backgroundColor: applicationTheme.primaryColor,
-                      backgroundImage:
-                          const AssetImage("assets/images/avatar.png"),
-                    )
-                  : CircleAvatar(
-                      radius: 22,
-                      backgroundColor: applicationTheme.primaryColor,
-                      backgroundImage: NetworkImage(
-                          Provider.of<AuthProvider>(context, listen: false)
-                              .peerUserData!
-                              .userPic
-                              .toString()),
-                    ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
+      // backgroundColor: applicationTheme.backgroundColor,
+      appBar: AppBar(
+        leadingWidth: 26,
+        title: Row(
+          children: [
+            Provider.of<AuthProvider>(context, listen: false)
+                    .peerUserData!
+                    .userPic!
+                    .isEmpty
+                ? CircleAvatar(
+                    radius: 20,
+                    backgroundColor: applicationTheme.backgroundColor,
+                    backgroundImage:
+                        const AssetImage("assets/images/avatar.png"),
+                  )
+                : CircleAvatar(
+                    radius: 20,
+                    backgroundColor: applicationTheme.backgroundColor,
+                    backgroundImage: NetworkImage(
                       Provider.of<AuthProvider>(context, listen: false)
                           .peerUserData!
-                          .name
+                          .userPic
                           .toString(),
-                      style: const TextStyle(
-                          fontSize: 18.5, fontWeight: FontWeight.bold)),
-                  const LastSeenChat(),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  // notifyUserWithCall("Calling from ${Provider.of<MyProvider>(context,listen: false).auth.currentUser!.displayName}",
-                  //   Provider.of<MyProvider>(context,listen: false).peerUserData!["email"],
-                  //   Provider.of<MyProvider>(context,listen: false).peerUserData!["userId"],
-                  //   Provider.of<MyProvider>(context,listen: false).peerUserData!["name"],
-                  //   "video"
-                  // );
-                  // Navigator.pushNamed(context, 'video_call');
-                },
-                icon: const Icon(Icons.videocam)),
-            IconButton(
-              onPressed: () {
-                // notifyUserWithCall("Calling from ${Provider.of<MyProvider>(context,listen: false).auth.currentUser!.displayName}",
-                //     Provider.of<MyProvider>(context,listen: false).peerUserData!["email"],
-                //     Provider.of<MyProvider>(context,listen: false).peerUserData!["userId"],
-                //     Provider.of<MyProvider>(context,listen: false).peerUserData!["name"],
-                //     "audio"
-                // );
-                // Navigator.pushNamed(context, 'audio_call');
-              },
-              icon: const Icon(Icons.call),
+                    ),
+                  ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    Provider.of<AuthProvider>(context, listen: false)
+                        .peerUserData!
+                        .name
+                        .toString(),
+                    style: applicationTheme.textTheme.bodyText1!
+                        .copyWith(color: AppColors.whiteColor)),
+                const SizedBox(height: 6),
+                const LastSeenChat(),
+              ],
             ),
           ],
         ),
-        body: Column(
-          children: const [
-            Expanded(
-              child: Messages(),
-            ),
-            MessagesCompose(),
-          ],
-        ));
+        actions: [
+          IconButton(
+              onPressed: () {
+                // notifyUserWithCall("Calling from ${Provider.of<MyProvider>(context,listen: false).auth.currentUser!.displayName}",
+                //   Provider.of<MyProvider>(context,listen: false).peerUserData!["email"],
+                //   Provider.of<MyProvider>(context,listen: false).peerUserData!["userId"],
+                //   Provider.of<MyProvider>(context,listen: false).peerUserData!["name"],
+                //   "video"
+                // );
+                // Navigator.pushNamed(context, 'video_call');
+              },
+              icon: const Icon(Icons.videocam)),
+          IconButton(
+            onPressed: () {
+              // notifyUserWithCall("Calling from ${Provider.of<MyProvider>(context,listen: false).auth.currentUser!.displayName}",
+              //     Provider.of<MyProvider>(context,listen: false).peerUserData!["email"],
+              //     Provider.of<MyProvider>(context,listen: false).peerUserData!["userId"],
+              //     Provider.of<MyProvider>(context,listen: false).peerUserData!["name"],
+              //     "audio"
+              // );
+              // Navigator.pushNamed(context, 'audio_call');
+            },
+            icon: const Icon(Icons.call),
+          ),
+        ],
+      ),
+      body: Column(
+        children: const [
+          Expanded(
+            child: Messages(),
+          ),
+          MessagesCompose(),
+        ],
+      ),
+    );
   }
 }

@@ -1,13 +1,12 @@
 import 'dart:io';
-import 'dart:math' as math;
+import 'package:chat_app/Utils/constants.dart';
+import 'package:grouped_list/grouped_list.dart';
 
 import 'package:chat_app/Widgets/receiver_message_card.dart';
 import 'package:chat_app/Widgets/sender_message_card.dart';
 import 'package:chat_app/Widgets/utils.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 // import 'package:full_chat_application/widget/receiver_message_card.dart';
 // import 'package:full_chat_application/widget/sender_message_card.dart';
 import 'package:intl/intl.dart';
@@ -18,11 +17,6 @@ import 'package:provider/provider.dart';
 
 import '../Models/messages_model.dart';
 import '../Provider/auth_provider.dart';
-
-// import '../Utils.dart';
-// import '../notifications/notifications.dart';
-// import '../provider/my_provider.dart';
-// import '../firebase_helper/fireBaseHelper.dart';
 
 class Messages extends StatelessWidget {
   const Messages({super.key});
@@ -38,68 +32,6 @@ class Messages extends StatelessWidget {
       initialData: null,
       child: const MessageList(),
     );
-    //  StreamBuilder(
-    //   stream:FireBaseHelper().getMessages(context,chatId: Provider.of<MyProvider>(context,listen: false).getChatId(context)),
-    //   builder:(BuildContext context,
-    //       AsyncSnapshot<QuerySnapshot> snapshot) {
-    //     if (snapshot.hasError) {
-    //       return const Text('Something went wrong try again');
-    //     }
-    //     if (snapshot.connectionState == ConnectionState.waiting) {
-    //       return const Center(
-    //         child: CircularProgressIndicator(),
-    //       );
-    //     }
-
-    //     return snapshot.data!.size == 0?
-    //     Column(
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       children: const [
-    //         Center(child: Text('No messages')),
-    //       ],
-    //     ):
-    //       ListView.builder(
-    //           reverse: true,
-    //           shrinkWrap: true ,
-    //           itemCount: snapshot.data!.docs.length,
-    //           itemBuilder: (context, index) {
-    //             if (Provider.of<MyProvider>(context,listen: false).auth.currentUser!.uid
-    //                 == snapshot.data!.docs[index]['senderId'].toString()) {
-    //               return InkWell(
-    //                  onTap: (){
-    //                    if(snapshot.data!.docs[index]['msgType'].toString() == "document"||snapshot.data!.docs[index]['msgType'].toString() == "voice message"){
-    //                      downloadFile(context,snapshot.data!.docs[index]['message'].toString(),snapshot.data!.docs[index]['fileName'].toString(),snapshot.data!.docs[index]['msgType'].toString());
-    //                    }
-    //                  },
-    //                 child: SenderMessageCard(
-    //                     snapshot.data!.docs[index]['fileName'].toString(),
-    //                     snapshot.data!.docs[index]['msgType'].toString(),
-    //                     snapshot.data!.docs[index]['message'].toString(),
-    //                     snapshot.data!.docs[index]['msgTime']==null?
-    //                     DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.parse(Timestamp.now().toDate().toString())):
-    //                     DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.parse(snapshot.data!.docs[index]['msgTime'].toDate().toString()))
-    //                 ),
-    //               );
-    //             } else {
-    //               return InkWell(
-    //                 onTap: (){
-    //                   if(snapshot.data!.docs[index]['msgType'].toString() == "document"||snapshot.data!.docs[index]['msgType'].toString() == "voice message"){
-    //                     downloadFile(context,snapshot.data!.docs[index]['message'].toString(),snapshot.data!.docs[index]['fileName'].toString(),snapshot.data!.docs[index]['msgType'].toString());
-    //                   }
-    //                 },
-    //                 child: ReceiverMessageCard(
-    //                     snapshot.data!.docs[index]['fileName'].toString(),
-    //                     snapshot.data!.docs[index]['msgType'].toString(),
-    //                     snapshot.data!.docs[index]['message'].toString(),
-    //                     snapshot.data!.docs[index]['msgTime']==null?
-    //                     DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.parse(Timestamp.now().toDate().toString())):
-    //                     DateFormat('dd-MM-yyyy hh:mm a').format(DateTime.parse(snapshot.data!.docs[index]['msgTime'].toDate().toString()))
-    //                 ),
-    //               );
-    //             }
-    //           });
-    //   },
-    // );
   }
 }
 
@@ -110,7 +42,19 @@ class MessageList extends StatefulWidget {
   State<MessageList> createState() => _MessageListState();
 }
 
-class _MessageListState extends State<MessageList> with WidgetsBindingObserver {
+class _MessageListState extends State<MessageList> {
+  //  if (!mounted) {
+  //     if (Provider.of<List<MessagesModel>?>(context, listen: false)!
+  //         .where((i) => i.isRead == false)
+  //         .isNotEmpty) {
+  //       scrollController.jumpTo(
+  //         Provider.of<List<MessagesModel>?>(context, listen: false)!
+  //             .where((i) => i.isRead == false)
+  //             .length
+  //             .toDouble(),
+  //       );
+  //     }
+  //   }
   Future<void> downloadFile(context, fileUrl, fileName, fileType) async {
     Directory? appDocDir = await getApplicationDocumentsDirectory();
     final status = await Permission.storage.request();
@@ -182,122 +126,159 @@ class _MessageListState extends State<MessageList> with WidgetsBindingObserver {
     var provider = Provider.of<AuthProvider>(context, listen: false);
     Provider.of<AuthProvider>(context, listen: true).updatePeerUserRead(
         Provider.of<AuthProvider>(context, listen: false).getChatId(), true);
-    return messagesList == null
-        ? const Center(child: CircularProgressIndicator())
-        : messagesList.isEmpty
-            ? const Center(child: Text("Messages Not Found"))
-            : Stack(
-                children: [
-                  NotificationListener<ScrollNotification>(
-                    onNotification: (ScrollNotification notification) {
-                      if (notification.metrics.pixels == 0.0) {
-                        setState(() {
-                          isScrollVisible = false;
-                        });
-                      } else {
-                        setState(() {
-                          isScrollVisible = true;
-                        });
-                      }
-                      //   // if (notification.direction == ScrollDirection.idle ||
-                      //   //     notification.direction.index != 1) {
-                      //   //   setState(() {
-                      //   //     isScrollVisible = true;
-                      //   //   });
-                      //   // }
-                      //   //else {
-                      //   //   // setState(() {
-                      //   //   //   isScrollVisible = false;
-                      //   //   // });
-                      //   // }
-                      // }
-                      return true;
-                    },
-                    child: ListView.builder(
-                        reverse: true,
-                        shrinkWrap: true,
-                        controller: scrollController,
-                        itemCount: messagesList.length,
-                        itemBuilder: (context, index) {
-                          var messages = messagesList.toList()[index];
-                          if (provider.currentUserId == messages.senderId) {
-                            return InkWell(
-                              onTap: () {
-                                if (messages.msgType == "document" ||
-                                    messages.msgType == "voice message") {
-                                  downloadFile(context, messages.message,
-                                      messages.fileName, messages.msgType);
-                                }
-                              },
-                              child: SenderMessageCard(messages
-                                  // messages.fileName,
-                                  // messages.msgType.toString(),
-                                  // messages.message.toString(),
-                                  // messages.msgTime == null
-                                  //     ? DateFormat('dd-MM-yyyy hh:mm a').format(
-                                  //         DateTime.parse(Timestamp.now()
-                                  //             .toDate()
-                                  //             .toString()))
-                                  //     : DateFormat('dd-MM-yyyy hh:mm a').format(
-                                  //         DateTime.parse(messages.msgTime!
-                                  //             .toDate()
-                                  //             .toString())),
-                                  ),
-                            );
-                          } else {
-                            return InkWell(
-                              onTap: () {
-                                if (messages.msgType == "document" ||
-                                    messages.msgType == "voice message") {
-                                  downloadFile(context, messages.message,
-                                      messages.fileName, messages.msgType);
-                                }
-                              },
-                              child: ReceiverMessageCard(messages),
-                            );
-                          }
-                        }),
-                  ),
-                  // ),
-                  Positioned(
-                    bottom: 20, right: 18,
-                    // alignment: Alignment.bottomRight,
-                    child: Visibility(
-                      visible: isScrollVisible,
-                      child: InkWell(
-                        // radius: 34,
-                        // splashRadius: 50,
-                        splashColor: Colors.grey,
-                        highlightColor: Colors.grey,
-                        // color: Colors.red,
-                        overlayColor: MaterialStateProperty.all(Colors.grey),
-                        // child: Transform.rotate(
-                        //   angle: 280 * math.pi / 186,
-                        child: const Icon(
-                          Icons.expand_circle_down_rounded,
-                          // chevron_left,
-                          color: Colors.black,
-                          size: 38,
-                        ),
-                        // ),
-                        // const Icon(Icons.expand_circle_down_rounded,
-                        //     color: Colors.black, size: 38),
-                        onTap: () {
-                          // provider.
-                          scrollController.jumpTo(
-                            scrollController.position.minScrollExtent,
-                          );
+    ThemeData applicationTheme = Theme.of(context);
 
-                          // scrollController.animateTo(
-                          //   messagesList.length.toDouble(),
-                          //   duration: const Duration(milliseconds: 100),
-                          //   curve: Curves.easeInOut,
-                          // );
+    if (messagesList == null) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (messagesList.isEmpty) {
+      return const Center(child: Text("Messages Not Found"));
+    } else {
+      return Stack(
+        children: [
+          NotificationListener<ScrollNotification>(
+            onNotification: (ScrollNotification notification) {
+              // if (messagesList.where((i) => i.isRead == false).isNotEmpty) {
+              //   scrollController.jumpTo(
+              //     messagesList
+              //         .where((i) => i.isRead == false)
+              //         .length
+              //         .toDouble(),
+              //   );
+              // }
+
+              if (notification.metrics.pixels == 0.0) {
+                setState(() {
+                  isScrollVisible = false;
+                });
+              } else {
+                setState(() {
+                  isScrollVisible = true;
+                });
+              }
+              //   // if (notification.direction == ScrollDirection.idle ||
+              //   //     notification.direction.index != 1) {
+              //   //   setState(() {
+              //   //     isScrollVisible = true;
+              //   //   });
+              //   // }
+              //   //else {
+              //   //   // setState(() {
+              //   //   //   isScrollVisible = false;
+              //   //   // });
+              //   // }
+              // }
+              return true;
+            },
+            child: GroupedListView<MessagesModel, String>(
+              controller: scrollController,
+              reverse: true,
+              shrinkWrap: true,
+              useStickyGroupSeparators: true,
+              floatingHeader: true,
+              order: GroupedListOrder.DESC,
+              elements: messagesList,
+              groupBy: (element) =>
+                  DateFormat.yMMMd().format(element.msgTime!.toDate()),
+              groupSeparatorBuilder: (String groupByValue) => Container(
+                  padding: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                      color: applicationTheme.cardColor,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(8.0))),
+                  child: Text(
+                    groupByValue,
+                    textAlign: TextAlign.center,
+                    style: applicationTheme.textTheme.bodyText2,
+                  )),
+              itemComparator: (item1, item2) =>
+                  item1.msgTime!.toDate().compareTo(item2.msgTime!.toDate()),
+              itemBuilder: (context, MessagesModel messages) {
+                return provider.currentUserId == messages.senderId
+                    ? InkWell(
+                        onTap: () {
+                          if (messages.msgType == "document" ||
+                              messages.msgType == "voice message") {
+                            downloadFile(context, messages.message,
+                                messages.fileName, messages.msgType);
+                          }
                         },
-                      ),
-                    ),
-                  ),
-                ],
-              );
+                        child: SenderMessageCard(messages),
+                      )
+                    : InkWell(
+                        onTap: () {
+                          if (messages.msgType == "document" ||
+                              messages.msgType == "voice message") {
+                            downloadFile(context, messages.message,
+                                messages.fileName, messages.msgType);
+                          }
+                        },
+                        child: ReceiverMessageCard(messages),
+                      );
+              },
+            ),
+            // ListView.builder(
+            //     reverse: true,
+            //     shrinkWrap: true,
+            //     controller: scrollController,
+            //     itemCount: messagesList.length,
+            //     itemBuilder: (context, index) {
+            //       var messages = messagesList.toList()[index];
+
+            //       return provider.currentUserId == messages.senderId
+            //           ? InkWell(
+            //               onTap: () {
+            //                 if (messages.msgType == "document" ||
+            //                     messages.msgType == "voice message") {
+            //                   downloadFile(context, messages.message,
+            //                       messages.fileName, messages.msgType);
+            //                 }
+            //               },
+            //               child: SenderMessageCard(messages),
+            //             )
+            //           : InkWell(
+            //               onTap: () {
+            //                 if (messages.msgType == "document" ||
+            //                     messages.msgType == "voice message") {
+            //                   downloadFile(context, messages.message,
+            //                       messages.fileName, messages.msgType);
+            //                 }
+            //               },
+            //               child: ReceiverMessageCard(messages),
+            //             );
+            //     }),
+          ),
+          // ),
+          Positioned(
+            bottom: 20,
+            right: 18,
+            child: Visibility(
+              visible: isScrollVisible,
+              child: InkWell(
+                splashColor: Colors.grey,
+                highlightColor: Colors.grey,
+                radius: 30,
+                borderRadius: BorderRadius.circular(30),
+                overlayColor: MaterialStateProperty.all(Colors.grey),
+                // child: Transform.rotate(
+                //   angle: 280 * math.pi / 186,
+                child: Icon(
+                  Icons.expand_circle_down_rounded,
+                  color: applicationTheme.textTheme.bodyText2!.color,
+                  size: 38,
+                ),
+                // ),
+
+                onTap: () {
+                  scrollController.jumpTo(
+                    scrollController.position.minScrollExtent,
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      );
+    }
   }
 }
