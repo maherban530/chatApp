@@ -28,7 +28,6 @@ class _LogIn extends State<LogIn> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: applicationTheme.backgroundColor,
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(0),
         child: CustomAppBar(),
@@ -143,6 +142,20 @@ class _LogIn extends State<LogIn> {
                   );
                 },
                 child: const Text('LogIn with Phone Number'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Provider.of<AuthProvider>(context, listen: false)
+                      .googleSignIn(context);
+                },
+                child: const Text('Google SignIn'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Provider.of<AuthProvider>(context, listen: false)
+                      .facebookSignIn(context);
+                },
+                child: const Text('Facebook SignIn'),
               ),
             ],
           ),

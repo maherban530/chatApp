@@ -62,6 +62,13 @@ class ChatAppTheme {
         // primaryColorLight: ApplicationColors.backgroundDark,
         // primaryColorDark: ApplicationColors.backgroundLight,
         // dividerColor: ApplicationColors.gray,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(
+              ApplicationColors.primaryColorLight,
+            ), //button color
+          ),
+        ),
         scaffoldBackgroundColor: Colors.grey.shade300,
         appBarTheme:
             const AppBarTheme(color: ApplicationColors.primaryColorLight),
@@ -121,6 +128,13 @@ class ChatAppTheme {
         cardColor: ApplicationColors.reciverCardColor,
         iconTheme: const IconThemeData(
             color: ApplicationColors.backgroundLight, size: 20),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(
+              ApplicationColors.primaryColorLight,
+            ), //button color
+          ),
+        ),
         textTheme: themeData.textTheme.copyWith(
           bodyText1: const TextStyle(
               color: ApplicationColors.primaryTextColorDark,

@@ -6,6 +6,8 @@ import 'package:chat_app/Screens/Auth_Screen/signup.dart';
 import 'package:chat_app/Screens/Auth_Screen/user_info_get.dart';
 import 'package:chat_app/Screens/Dashboard/chat.dart';
 import 'package:chat_app/Screens/Dashboard/home.dart';
+import 'package:chat_app/Screens/Dashboard/profile.dart';
+import 'package:chat_app/Screens/Dashboard/setting.dart';
 import 'package:chat_app/Screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -19,4 +21,6 @@ Map<String, Widget Function(BuildContext context)> route =
   AppRoutes.login: (context) => const LogIn(),
   AppRoutes.home: (context) => const Home(),
   AppRoutes.chat: (context) => const Chat(),
+  AppRoutes.setting: (context) => const Setting(),
+  AppRoutes.profile: (context) => const Profile(),
 };

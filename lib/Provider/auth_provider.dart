@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../Core/route_path.dart';
 import '../Database/database_path.dart';
@@ -16,6 +18,9 @@ import '../Widgets/utils.dart';
 class AuthProvider extends ChangeNotifier {
   FirebaseAuth get _firebaseAuth => FirebaseAuth.instance;
   FirebaseFirestore get _firebaseStore => FirebaseFirestore.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  // final FacebookAuth _facebookAuth = FacebookAuth.instance;
+
   String? get currentUserId => FirebaseAuth.instance.currentUser?.uid ?? "";
 
   Users? peerUserData;
@@ -133,6 +138,109 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> googleSignIn(BuildContext context) async {
+    GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+    GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    await _firebaseAuth
+        .signInWithCredential(credential)
+        .then((userCredential) async {
+      if (userCredential.user != null) {
+        if (userCredential.additionalUserInfo!.isNewUser) {
+          Users users = Users(
+            email: userCredential.user!.email,
+            fcmToken: await _fToken(),
+            name: userCredential.user!.displayName,
+            userStatus: 'Online',
+            userPic: userCredential.user!.photoURL,
+            uid: userCredential.user!.uid,
+            phoneNumber: '',
+          );
+          await _firebaseStore
+              .doc('${DatabasePath.userCollection}/$currentUserId')
+              .set(users.toJson(), SetOptions(merge: true))
+              .then((value) {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.home,
+              arguments: UserIdModel(userCredential.user!.uid),
+              (route) => false,
+            );
+          });
+        } else {
+          checkUserData(context);
+        }
+      } else {
+        throw Exception('Something went wrong');
+      }
+    });
+  }
+
+  Future<void> facebookSignIn(BuildContext context) async {
+    // final LoginResult result =
+    // FacebookAuth.instance
+    //     .login(permissions: ['email', 'public_profile']).then((value) {
+    //   FacebookAuth.instance.getUserData().then((userData) {
+    //     print(userData);
+    //   });
+    // });
+    final LoginResult result = await FacebookAuth.instance.login();
+    if (result.status == LoginStatus.success) {
+      // _accessToken = result.accessToken;
+      // _printCredentials();
+      // get the user data
+      // by default we get the userId, email,name and picture
+      final userData = await FacebookAuth.instance.getUserData();
+      // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
+      // _userData = userData;
+      print(userData);
+    } else {
+      print(result.status);
+      print(result.message);
+    }
+    // if (result.status == LoginStatus.success) {
+    //   // var da = _facebookAuth.getUserData();
+    //   final AuthCredential credential =
+    //       FacebookAuthProvider.credential(result.accessToken!.token);
+    //   await _firebaseAuth
+    //       .signInWithCredential(credential)
+    //       .then((userCredential) async {
+    //     if (userCredential.user != null) {
+    //       if (userCredential.additionalUserInfo!.isNewUser) {
+    //         Users users = Users(
+    //           email: userCredential.user!.email,
+    //           fcmToken: await _fToken(),
+    //           name: userCredential.user!.displayName,
+    //           userStatus: 'Online',
+    //           userPic: userCredential.user!.photoURL,
+    //           uid: userCredential.user!.uid,
+    //           phoneNumber: '',
+    //         );
+    //         await _firebaseStore
+    //             .doc('${DatabasePath.userCollection}/$currentUserId')
+    //             .set(users.toJson(), SetOptions(merge: true))
+    //             .then((value) {
+    //           Navigator.pushNamedAndRemoveUntil(
+    //             context,
+    //             AppRoutes.home,
+    //             arguments: UserIdModel(userCredential.user!.uid),
+    //             (route) => false,
+    //           );
+    //         });
+    //       } else {
+    //         checkUserData(context);
+    //       }
+    //     } else {
+    //       throw Exception('Something went wrong');
+    //     }
+    //   });
+    // }
+  }
+
   checkUserData(BuildContext context) {
     _firebaseStore
         .collection(DatabasePath.userCollection)
@@ -188,8 +296,10 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  void logOut() {
-    _firebaseAuth.signOut();
+  void logOut() async {
+    await _firebaseAuth.signOut();
+    await _googleSignIn.signOut();
+    FacebookAuth.instance.logOut();
   }
 
   Stream<List<Users>> getUsersData() {
@@ -225,6 +335,23 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void userProfilePicUpdate(BuildContext context, String? profilePic) {
+    _firebaseStore
+        .collection(DatabasePath.userCollection)
+        .doc(currentUserId)
+        .update({
+      "userPic": profilePic,
+    }).then((value) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.home,
+        (route) => false,
+      );
+    });
+
+    notifyListeners();
+  }
+
   Stream<Users> getLastSeenChat() {
     return _firebaseStore
         .collection(DatabasePath.userCollection)
@@ -238,7 +365,7 @@ class AuthProvider extends ChangeNotifier {
     // });
   }
 
-  Stream<Users> getUserDetalsWithId(userId) {
+  Stream<Users> getUserDetailsWithId(userId) {
     return _firebaseStore
         .collection(DatabasePath.userCollection)
         .doc(userId)
@@ -352,6 +479,25 @@ class AuthProvider extends ChangeNotifier {
     FirebaseStorage storage = FirebaseStorage.instance;
     Reference ref =
         storage.ref().child("Media").child(getChatId()).child(file is File
+            ? voiceMessageName
+            : file.runtimeType == FilePickerResult
+                ? file.files.single.name
+                : file.name);
+    return ref.putFile(file is File
+        ? file
+        : File(file.runtimeType == FilePickerResult
+            ? file!.files.single.path
+            : file.path));
+  }
+
+  UploadTask getRefrenceFromStorageProfileImage(
+      file, voiceMessageName, context) {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage
+        .ref()
+        .child("ProfilePic")
+        .child(currentUserId!)
+        .child(file is File
             ? voiceMessageName
             : file.runtimeType == FilePickerResult
                 ? file.files.single.name

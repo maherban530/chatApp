@@ -6,8 +6,6 @@ import '../../Core/theme.dart';
 import '../../Models/messages_model.dart';
 import '../../Models/user_model.dart';
 import '../../Provider/auth_provider.dart';
-import '../../Provider/theme_provider.dart';
-import '../../Utils/constants.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -32,27 +30,14 @@ class _HomeState extends State<Home> {
         ),
         actions: [
           IconButton(
-            // style: applicationTheme.textButtonTheme.style,
             onPressed: () {
-              _showDialog(context);
-            },
-            icon: const Icon(
-              Icons.lightbulb,
-              color: ApplicationColors.backgroundLight,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              final provider =
-                  Provider.of<AuthProvider>(context, listen: false);
-              provider.logOut();
-              Navigator.pushReplacementNamed(
+              Navigator.pushNamed(
                 context,
-                AppRoutes.signup,
+                AppRoutes.setting,
               );
             },
             icon: const Icon(
-              Icons.logout,
+              Icons.settings,
               color: ApplicationColors.backgroundLight,
             ),
           ),
@@ -161,7 +146,7 @@ class UserList extends StatelessWidget {
                                                                 AuthProvider>(
                                                             context,
                                                             listen: false)
-                                                        .getUserDetalsWithId(
+                                                        .getUserDetailsWithId(
                                                             snapshot1
                                                                 .data!
                                                                 .first!
@@ -492,89 +477,4 @@ class UserList extends StatelessWidget {
         return '';
     }
   }
-}
-
-void _showDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      final theamChanger = Provider.of<ThemeChanger>(context);
-      ThemeData applicationTheme = Theme.of(context);
-
-      return AlertDialog(
-        backgroundColor: applicationTheme.scaffoldBackgroundColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-        titlePadding: EdgeInsets.zero,
-        title: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                splashRadius: 20,
-                icon: Icon(Icons.close, color: applicationTheme.primaryColor),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Select Theme",
-                  style: applicationTheme.textTheme.bodyText1,
-                ),
-              ],
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            RadioListTile<ThemeMode>(
-              title: Text("System Theme",
-                  style: applicationTheme.textTheme.subtitle1),
-              activeColor: applicationTheme.primaryColor,
-              value: ThemeMode.system,
-              groupValue: theamChanger.theamMode,
-              onChanged: theamChanger.setTheme,
-            ),
-            RadioListTile<ThemeMode>(
-              title: Text(
-                "Light Theme",
-                style: applicationTheme.textTheme.subtitle1,
-              ),
-              activeColor: applicationTheme.primaryColor,
-              value: ThemeMode.light,
-              groupValue: theamChanger.theamMode,
-              onChanged: theamChanger.setTheme,
-            ),
-            RadioListTile<ThemeMode>(
-              title: Text(
-                "Dark Theme",
-                style: applicationTheme.textTheme.subtitle1,
-              ),
-              activeColor: applicationTheme.primaryColor,
-              value: ThemeMode.dark,
-              groupValue: theamChanger.theamMode,
-              onChanged: theamChanger.setTheme,
-            ),
-          ],
-        ),
-        // actions: <Widget>[
-        //   ElevatedButton(
-        //     child: const Text("OK"),
-        //     onPressed: () {
-
-        //       Navigator.of(context).pop();
-        //     },
-        //   ),
-        // ],
-      );
-    },
-  );
 }

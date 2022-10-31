@@ -32,7 +32,6 @@ class _SignUp extends State<SignUp> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: applicationTheme.backgroundColor,
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(0),
         child: CustomAppBar(),

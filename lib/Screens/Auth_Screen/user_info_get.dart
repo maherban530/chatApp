@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:chat_app/Models/user_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../Notifications/notification.dart';
 import '../../Provider/auth_provider.dart';
 import '../../Widgets/round_button.dart';
 import '../../Widgets/utils.dart';
@@ -43,7 +45,7 @@ class _UserInformationGetState extends State<UserInformationGet> {
     ThemeData applicationTheme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: applicationTheme.backgroundColor,
+      // backgroundColor: applicationTheme.backgroundColor,
       body: _buildBody(),
     );
   }
@@ -167,18 +169,25 @@ class _UserInformationGetState extends State<UserInformationGet> {
       Users users = Users(
         name: _nameController.text,
         email: _emailController.text,
-        userPic: _imageFile != null ? _imageFile!.path : '',
+        // userPic: _imageFile != null ? _imageFile!.path : '',
       );
       Provider.of<AuthProvider>(context, listen: false)
           .usersUpdate(context, users, userId.userId);
-      // await ref
-      //     .read(senderUserDataControllerProvider)
-      //     .saveSenderUserDataToFirebase(
-      //       context,
-      //       mounted,
-      //       userName: _nameController.text,
-      //       imageFile: _imageFile,
-      //     );
+
+      if (_imageFile != null) {
+        UploadTask uploadTask =
+            Provider.of<AuthProvider>(context, listen: false)
+                .getRefrenceFromStorageProfileImage(_imageFile, "", context);
+        uploadProfileImage("", "image", uploadTask, context);
+        // await ref
+        //     .read(senderUserDataControllerProvider)
+        //     .saveSenderUserDataToFirebase(
+        //       context,
+        //       mounted,
+        //       userName: _nameController.text,
+        //       imageFile: _imageFile,
+        //     );
+      }
     } else {
       buildShowSnackBar(context, 'Please Enter Name & Email');
     }
@@ -189,4 +198,28 @@ class _UserInformationGetState extends State<UserInformationGet> {
     _imageFile = await pickImageFromGallery(context);
     setState(() {});
   }
+}
+
+void uploadProfileImage(String fileName, String fileType, UploadTask uploadTask,
+    BuildContext context) {
+  uploadTask.snapshotEvents.listen((event) {
+    uploadingNotification(
+      fileType,
+      'image update',
+      event.totalBytes,
+      event.bytesTransferred,
+      // true
+    );
+  });
+  uploadTask.whenComplete(() => {
+        uploadTask.then((fileUrl) {
+          fileUrl.ref.getDownloadURL().then((value) {
+            Provider.of<AuthProvider>(context, listen: false)
+                .userProfilePicUpdate(
+              context,
+              value,
+            );
+          });
+        })
+      });
 }
