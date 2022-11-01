@@ -23,14 +23,14 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _appProvider = Provider.of<AuthProvider>(context, listen: false);
     _appProvider.updateUserStatus("Online");
-    _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+    // _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
     // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, Provider.of<MyProvider>(context,listen: false).peerUserData!["email"]);
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
-    _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+    // _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
     super.didChangeDependencies();
   }
 
@@ -40,7 +40,7 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
     _appProvider.updateUserStatus(
       Timestamp.now(),
     );
-    _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+    // _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
 
     // updatePeerDevice(_appProvider.auth.currentUser!.email, "0");
     super.dispose();
@@ -53,7 +53,7 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
         _appProvider.updateUserStatus(
           Timestamp.now(),
         );
-        _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+        // _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
 
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, "0");
         break;
@@ -61,7 +61,7 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
         _appProvider.updateUserStatus(
           Timestamp.now(),
         );
-        _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+        // _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
 
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, "0");
         break;
@@ -69,12 +69,12 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
         _appProvider.updateUserStatus(
           Timestamp.now(),
         );
-        _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+        // _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, "0");
         break;
       case AppLifecycleState.resumed:
         _appProvider.updateUserStatus("Online");
-        _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
+        // _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
         // _appProvider.updatePeerUserRead(_appProvider.getChatId(), true);
         // updatePeerDevice(Provider.of<MyProvider>(context,listen: false).auth.currentUser!.email, Provider.of<MyProvider>(context,listen: false).peerUserData!["email"]);
         break;

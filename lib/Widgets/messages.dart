@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:chat_app/Utils/constants.dart';
+import 'package:flutter/rendering.dart';
 import 'package:grouped_list/grouped_list.dart';
 
 import 'package:chat_app/Widgets/receiver_message_card.dart';
@@ -94,7 +95,7 @@ class _MessageListState extends State<MessageList> {
   }
 
   bool isScrollVisible = false;
-  final scrollController = ScrollController();
+  late ScrollController scrollController;
 
   // @override
   // void initState() {
@@ -124,19 +125,66 @@ class _MessageListState extends State<MessageList> {
     List<MessagesModel>? messagesList =
         Provider.of<List<MessagesModel>?>(context);
     var provider = Provider.of<AuthProvider>(context, listen: false);
-    Provider.of<AuthProvider>(context, listen: true).updatePeerUserRead(
-        Provider.of<AuthProvider>(context, listen: false).getChatId(), true);
+    // Provider.of<AuthProvider>(context, listen: true).updatePeerUserRead(
+    //     Provider.of<AuthProvider>(context, listen: false).getChatId(), true);
     ThemeData applicationTheme = Theme.of(context);
-
     if (messagesList == null) {
       return const Center(child: CircularProgressIndicator());
     } else if (messagesList.isEmpty) {
       return const Center(child: Text("Messages Not Found"));
     } else {
+      scrollController = ScrollController(
+        keepScrollOffset: true,
+        initialScrollOffset: messagesList
+                    .where((i) =>
+                        i.isRead == false &&
+                        i.senderId !=
+                            Provider.of<AuthProvider>(context, listen: false)
+                                .currentUserId)
+                    .length ==
+                1
+            ? 0
+            : 50 *
+                messagesList
+                    .where((i) =>
+                        i.isRead == false &&
+                        i.senderId !=
+                            Provider.of<AuthProvider>(context, listen: false)
+                                .currentUserId)
+                    .length
+                    .toDouble(),
+      );
+      // ignore: prefer_is_empty
+      // if (messagesList
+      //         .where((i) => i.isRead == false
+      //             // &&
+      //             // i.senderId !=
+      //             //     Provider.of<AuthProvider>(context, listen: false)
+      //             //         .currentUserId
+      //             )
+      //         .length !=
+      //     0) {
+      //   isScrollVisible = true;
+      // } else {
+      //   // isScrollVisible = false;
+      // }
+
+      if (messagesList
+              .where((i) =>
+                  i.isRead == false &&
+                  i.senderId !=
+                      Provider.of<AuthProvider>(context, listen: false)
+                          .currentUserId)
+              .length >
+          1) {
+        isScrollVisible = true;
+      } else {
+        // isScrollVisible = false;
+      }
       return Stack(
         children: [
           NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification notification) {
+            onNotification: (notification) {
               // if (messagesList.where((i) => i.isRead == false).isNotEmpty) {
               //   scrollController.jumpTo(
               //     messagesList
@@ -146,21 +194,33 @@ class _MessageListState extends State<MessageList> {
               //   );
               // }
 
-              if (notification.metrics.pixels == 0.0) {
+              if (notification.metrics.pixels <= 0.0) {
                 setState(() {
+                  // provider.updatePeerUserRead(provider.getChatId(), true);
                   isScrollVisible = false;
                 });
               } else {
                 setState(() {
+                  provider.updatePeerUserRead(provider.getChatId(), true);
                   isScrollVisible = true;
                 });
               }
-              //   // if (notification.direction == ScrollDirection.idle ||
-              //   //     notification.direction.index != 1) {
-              //   //   setState(() {
-              //   //     isScrollVisible = true;
-              //   //   });
-              //   // }
+
+              // if (notification is UserScrollNotification) {
+              //   if (notification.direction == ScrollDirection.idle) {
+              //     // ||
+              //     //   notification.direction.index != 1) {
+              //     setState(() {
+              //       // isScrollVisible = true;
+              //     });
+              //   }
+              // }
+              // if (notification.direction == ScrollDirection.idle ||
+              //     notification.direction.index != 1) {
+              //   setState(() {
+              //     isScrollVisible = true;
+              //   });
+              // }
               //   //else {
               //   //   // setState(() {
               //   //   //   isScrollVisible = false;
@@ -169,112 +229,152 @@ class _MessageListState extends State<MessageList> {
               // }
               return true;
             },
-            child: GroupedListView<MessagesModel, String>(
-              controller: scrollController,
-              reverse: true,
-              shrinkWrap: true,
-              useStickyGroupSeparators: true,
-              floatingHeader: true,
-              order: GroupedListOrder.DESC,
-              elements: messagesList,
-              groupBy: (element) =>
-                  DateFormat.yMMMd().format(element.msgTime!.toDate()),
-              groupSeparatorBuilder: (String groupByValue) => Container(
-                  padding: const EdgeInsets.all(5),
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  decoration: BoxDecoration(
-                      color: applicationTheme.cardColor,
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(8.0))),
-                  child: Text(
-                    groupByValue,
-                    textAlign: TextAlign.center,
-                    style: applicationTheme.textTheme.bodyText2,
-                  )),
-              itemComparator: (item1, item2) =>
-                  item1.msgTime!.toDate().compareTo(item2.msgTime!.toDate()),
-              itemBuilder: (context, MessagesModel messages) {
-                return provider.currentUserId == messages.senderId
-                    ? InkWell(
-                        onTap: () {
-                          if (messages.msgType == "document" ||
-                              messages.msgType == "voice message") {
-                            downloadFile(context, messages.message,
-                                messages.fileName, messages.msgType);
-                          }
-                        },
-                        child: SenderMessageCard(messages),
-                      )
-                    : InkWell(
-                        onTap: () {
-                          if (messages.msgType == "document" ||
-                              messages.msgType == "voice message") {
-                            downloadFile(context, messages.message,
-                                messages.fileName, messages.msgType);
-                          }
-                        },
-                        child: ReceiverMessageCard(messages),
-                      );
-              },
-            ),
-            // ListView.builder(
-            //     reverse: true,
-            //     shrinkWrap: true,
-            //     controller: scrollController,
-            //     itemCount: messagesList.length,
-            //     itemBuilder: (context, index) {
-            //       var messages = messagesList.toList()[index];
+            child:
+                // GroupedListView<MessagesModel, String>(
+                //   controller: scrollController,
+                //   reverse: true,
+                //   shrinkWrap: true,
+                //   useStickyGroupSeparators: true,
+                //   floatingHeader: true,
+                //   order: GroupedListOrder.DESC,
+                //   elements: messagesList,
+                //   groupBy: (element) =>
+                //       DateFormat.yMMMd().format(element.msgTime!.toDate()),
+                //   groupSeparatorBuilder: (String groupByValue) => Container(
+                //       padding: const EdgeInsets.all(5),
+                //       margin: const EdgeInsets.symmetric(vertical: 4),
+                //       decoration: BoxDecoration(
+                //           color: applicationTheme.cardColor,
+                //           borderRadius:
+                //               const BorderRadius.all(Radius.circular(8.0))),
+                //       child: Text(
+                //         groupByValue,
+                //         textAlign: TextAlign.center,
+                //         style: applicationTheme.textTheme.bodyText2,
+                //       )),
+                //   itemComparator: (item1, item2) =>
+                //       item1.msgTime!.toDate().compareTo(item2.msgTime!.toDate()),
+                //   itemBuilder: (context, MessagesModel messages) {
+                //     return provider.currentUserId == messages.senderId
+                //         ? InkWell(
+                //             onTap: () {
+                //               if (messages.msgType == "document" ||
+                //                   messages.msgType == "voice message") {
+                //                 downloadFile(context, messages.message,
+                //                     messages.fileName, messages.msgType);
+                //               }
+                //             },
+                //             child: SenderMessageCard(messages),
+                //           )
+                //         : InkWell(
+                //             onTap: () {
+                //               if (messages.msgType == "document" ||
+                //                   messages.msgType == "voice message") {
+                //                 downloadFile(context, messages.message,
+                //                     messages.fileName, messages.msgType);
+                //               }
+                //             },
+                //             child: ReceiverMessageCard(messages),
+                //           );
+                //   },
+                // ),
 
-            //       return provider.currentUserId == messages.senderId
-            //           ? InkWell(
-            //               onTap: () {
-            //                 if (messages.msgType == "document" ||
-            //                     messages.msgType == "voice message") {
-            //                   downloadFile(context, messages.message,
-            //                       messages.fileName, messages.msgType);
-            //                 }
-            //               },
-            //               child: SenderMessageCard(messages),
-            //             )
-            //           : InkWell(
-            //               onTap: () {
-            //                 if (messages.msgType == "document" ||
-            //                     messages.msgType == "voice message") {
-            //                   downloadFile(context, messages.message,
-            //                       messages.fileName, messages.msgType);
-            //                 }
-            //               },
-            //               child: ReceiverMessageCard(messages),
-            //             );
-            //     }),
+                ListView.builder(
+                    reverse: true,
+                    shrinkWrap: true,
+                    controller: scrollController,
+                    itemCount: messagesList.length,
+                    itemBuilder: (context, index) {
+                      var messages = messagesList.toList()[index];
+
+                      if (messagesList
+                              .where((i) => i.isRead == false
+                                  // &&
+                                  // i.senderId !=
+                                  //     Provider.of<AuthProvider>(context, listen: false)
+                                  //         .currentUserId
+                                  )
+                              .length ==
+                          1) {
+                        provider.updatePeerUserRead(provider.getChatId(), true);
+                        // isScrollVisible = true;
+                      } else {
+                        // isScrollVisible = false;
+                      }
+                      // if (messages.isRead == false) {
+                      //   isScrollVisible = true;
+                      // }
+                      return provider.currentUserId == messages.senderId
+                          ? InkWell(
+                              onTap: () {
+                                if (messages.msgType == "document" ||
+                                    messages.msgType == "voice message") {
+                                  downloadFile(context, messages.message,
+                                      messages.fileName, messages.msgType);
+                                }
+                              },
+                              child: SenderMessageCard(messages),
+                            )
+                          : InkWell(
+                              onTap: () {
+                                if (messages.msgType == "document" ||
+                                    messages.msgType == "voice message") {
+                                  downloadFile(context, messages.message,
+                                      messages.fileName, messages.msgType);
+                                }
+                              },
+                              child: ReceiverMessageCard(messages),
+                            );
+                    }),
           ),
+
           // ),
           Positioned(
             bottom: 20,
             right: 18,
-            child: Visibility(
-              visible: isScrollVisible,
-              child: InkWell(
-                splashColor: Colors.grey,
-                highlightColor: Colors.grey,
-                radius: 30,
-                borderRadius: BorderRadius.circular(30),
-                overlayColor: MaterialStateProperty.all(Colors.grey),
-                // child: Transform.rotate(
-                //   angle: 280 * math.pi / 186,
-                child: Icon(
-                  Icons.expand_circle_down_rounded,
-                  color: applicationTheme.textTheme.bodyText2!.color,
-                  size: 38,
-                ),
-                // ),
+            child: Column(
+              children: [
+                if (messagesList
+                        .where((i) =>
+                            i.isRead == false &&
+                            i.senderId !=
+                                Provider.of<AuthProvider>(context,
+                                        listen: false)
+                                    .currentUserId)
+                        .length >
+                    1)
+                  Text(messagesList
+                      .where((i) => i.isRead == false)
+                      .length
+                      .toString()),
+                Visibility(
+                  visible: isScrollVisible,
+                  child: InkWell(
+                    splashColor: Colors.grey,
+                    highlightColor: Colors.grey,
+                    radius: 30,
+                    borderRadius: BorderRadius.circular(30),
+                    overlayColor: MaterialStateProperty.all(Colors.grey),
+                    // child: Transform.rotate(
+                    //   angle: 280 * math.pi / 186,
+                    child: Icon(
+                      Icons.expand_circle_down_rounded,
+                      color: applicationTheme.textTheme.bodyText2!.color,
+                      size: 38,
+                    ),
 
-                onTap: () {
-                  scrollController.jumpTo(
-                    scrollController.position.minScrollExtent,
-                  );
-                },
-              ),
+                    // ),
+
+                    onTap: () {
+                      provider.updatePeerUserRead(provider.getChatId(), true);
+
+                      scrollController.jumpTo(
+                        scrollController.position.minScrollExtent,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],

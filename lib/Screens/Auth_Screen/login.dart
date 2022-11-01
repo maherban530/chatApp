@@ -1,3 +1,4 @@
+import 'package:chat_app/Screens/Auth_Screen/facebook_demo.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -152,6 +153,9 @@ class _LogIn extends State<LogIn> {
               ),
               ElevatedButton(
                 onPressed: () {
+                  // Navigator.of(context).push(MaterialPageRoute(
+                  //     builder: (context) => const FacebookLogin()));
+
                   Provider.of<AuthProvider>(context, listen: false)
                       .facebookSignIn(context);
                 },

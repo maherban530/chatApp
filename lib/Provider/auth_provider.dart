@@ -189,56 +189,56 @@ class AuthProvider extends ChangeNotifier {
     //   });
     // });
     final LoginResult result = await FacebookAuth.instance.login();
-    if (result.status == LoginStatus.success) {
-      // _accessToken = result.accessToken;
-      // _printCredentials();
-      // get the user data
-      // by default we get the userId, email,name and picture
-      final userData = await FacebookAuth.instance.getUserData();
-      // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
-      // _userData = userData;
-      print(userData);
-    } else {
-      print(result.status);
-      print(result.message);
-    }
     // if (result.status == LoginStatus.success) {
-    //   // var da = _facebookAuth.getUserData();
-    //   final AuthCredential credential =
-    //       FacebookAuthProvider.credential(result.accessToken!.token);
-    //   await _firebaseAuth
-    //       .signInWithCredential(credential)
-    //       .then((userCredential) async {
-    //     if (userCredential.user != null) {
-    //       if (userCredential.additionalUserInfo!.isNewUser) {
-    //         Users users = Users(
-    //           email: userCredential.user!.email,
-    //           fcmToken: await _fToken(),
-    //           name: userCredential.user!.displayName,
-    //           userStatus: 'Online',
-    //           userPic: userCredential.user!.photoURL,
-    //           uid: userCredential.user!.uid,
-    //           phoneNumber: '',
-    //         );
-    //         await _firebaseStore
-    //             .doc('${DatabasePath.userCollection}/$currentUserId')
-    //             .set(users.toJson(), SetOptions(merge: true))
-    //             .then((value) {
-    //           Navigator.pushNamedAndRemoveUntil(
-    //             context,
-    //             AppRoutes.home,
-    //             arguments: UserIdModel(userCredential.user!.uid),
-    //             (route) => false,
-    //           );
-    //         });
-    //       } else {
-    //         checkUserData(context);
-    //       }
-    //     } else {
-    //       throw Exception('Something went wrong');
-    //     }
-    //   });
+    //   // _accessToken = result.accessToken;
+    //   // _printCredentials();
+    //   // get the user data
+    //   // by default we get the userId, email,name and picture
+    //   final userData = await FacebookAuth.instance.getUserData();
+    //   // final userData = await FacebookAuth.instance.getUserData(fields: "email,birthday,friends,gender,link");
+    //   // _userData = userData;
+    //   print(userData);
+    // } else {
+    //   print(result.status);
+    //   print(result.message);
     // }
+    if (result.status == LoginStatus.success) {
+      // var da = _facebookAuth.getUserData();
+      final AuthCredential credential =
+          FacebookAuthProvider.credential(result.accessToken!.token);
+      await _firebaseAuth
+          .signInWithCredential(credential)
+          .then((userCredential) async {
+        if (userCredential.user != null) {
+          if (userCredential.additionalUserInfo!.isNewUser) {
+            Users users = Users(
+              email: userCredential.user!.email,
+              fcmToken: await _fToken(),
+              name: userCredential.user!.displayName,
+              userStatus: 'Online',
+              userPic: userCredential.user!.photoURL,
+              uid: userCredential.user!.uid,
+              phoneNumber: '',
+            );
+            await _firebaseStore
+                .doc('${DatabasePath.userCollection}/$currentUserId')
+                .set(users.toJson(), SetOptions(merge: true))
+                .then((value) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.home,
+                arguments: UserIdModel(userCredential.user!.uid),
+                (route) => false,
+              );
+            });
+          } else {
+            checkUserData(context);
+          }
+        } else {
+          throw Exception('Something went wrong');
+        }
+      });
+    }
   }
 
   checkUserData(BuildContext context) {

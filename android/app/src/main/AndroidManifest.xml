@@ -16,7 +16,7 @@
         android:label="chat_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        android:label="facebook auth">
+        <!-- android:label="facebook auth"> -->
 
         <meta-data
            android:name="com.facebook.sdk.ApplicationId"
