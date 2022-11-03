@@ -5,6 +5,7 @@ class Users {
   String? email;
   String? userPic;
   String? fcmToken;
+  String? chatWith;
   dynamic userStatus;
 
   Users(
@@ -14,6 +15,7 @@ class Users {
       this.email,
       this.userPic,
       this.fcmToken,
+      this.chatWith,
       this.userStatus});
 
   Users.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class Users {
     email = json['email'] ?? '';
     userPic = json['userPic'] ?? '';
     fcmToken = json['fcmToken'] ?? '';
+    chatWith = json['chatWith'] ?? '';
     userStatus = json['userStatus'] ?? '';
   }
 
@@ -34,6 +37,7 @@ class Users {
     data['email'] = email;
     data['userPic'] = userPic;
     data['fcmToken'] = fcmToken;
+    data['chatWith'] = chatWith;
     data['userStatus'] = userStatus;
     return data;
   }

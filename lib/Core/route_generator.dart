@@ -4,10 +4,12 @@ import 'package:chat_app/Screens/Auth_Screen/otp_screen.dart';
 import 'package:chat_app/Screens/Auth_Screen/phone_login.dart';
 import 'package:chat_app/Screens/Auth_Screen/signup.dart';
 import 'package:chat_app/Screens/Auth_Screen/user_info_get.dart';
+import 'package:chat_app/Screens/Dashboard/audio_call.dart';
 import 'package:chat_app/Screens/Dashboard/chat.dart';
 import 'package:chat_app/Screens/Dashboard/home.dart';
 import 'package:chat_app/Screens/Dashboard/profile.dart';
 import 'package:chat_app/Screens/Dashboard/setting.dart';
+import 'package:chat_app/Screens/Dashboard/video_call.dart';
 import 'package:chat_app/Screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -23,4 +25,6 @@ Map<String, Widget Function(BuildContext context)> route =
   AppRoutes.chat: (context) => const Chat(),
   AppRoutes.setting: (context) => const Setting(),
   AppRoutes.profile: (context) => const Profile(),
+  AppRoutes.audiocall: (context) => const AudioCall(),
+  AppRoutes.videocall: (context) => const VideoCall(),
 };

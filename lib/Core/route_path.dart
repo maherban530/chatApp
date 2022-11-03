@@ -9,4 +9,6 @@ class AppRoutes {
   static const chat = '/chat';
   static const setting = '/setting';
   static const profile = '/profile';
+  static const audiocall = '/audiocall';
+  static const videocall = '/videocall';
 }

@@ -85,6 +85,7 @@ class AuthProvider extends ChangeNotifier {
               name: '',
               userStatus: 'Online',
               userPic: '',
+              chatWith: '',
               uid: userCredential.user!.uid,
               phoneNumber: userCredential.user!.phoneNumber,
             );
@@ -157,6 +158,7 @@ class AuthProvider extends ChangeNotifier {
             name: userCredential.user!.displayName,
             userStatus: 'Online',
             userPic: userCredential.user!.photoURL,
+            chatWith: '',
             uid: userCredential.user!.uid,
             phoneNumber: '',
           );
@@ -217,6 +219,7 @@ class AuthProvider extends ChangeNotifier {
               name: userCredential.user!.displayName,
               userStatus: 'Online',
               userPic: userCredential.user!.photoURL,
+              chatWith: '',
               uid: userCredential.user!.uid,
               phoneNumber: '',
             );
@@ -333,6 +336,13 @@ class AuthProvider extends ChangeNotifier {
     });
 
     notifyListeners();
+  }
+
+  void updateCallStatus(status) {
+    _firebaseStore
+        .collection(DatabasePath.userCollection)
+        .doc(currentUserId)
+        .update({"chatWith": status});
   }
 
   void userProfilePicUpdate(BuildContext context, String? profilePic) {

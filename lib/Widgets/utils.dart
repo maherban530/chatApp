@@ -1,7 +1,42 @@
 import 'dart:io';
 
+import 'package:chat_app/Provider/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+import '../Core/route_path.dart';
+import '../Provider/shared_prafrence.dart';
+
+void cancelCall(BuildContext context, msg) {
+  if (Provider.of<AuthProvider>(context, listen: false).peerUserData?.email ==
+      null) {
+    getEmail().then((value) {
+      // notifyUser("${Provider.of<MyProvider>(context, listen: false).auth.currentUser!.displayName}",
+      //     "${Provider.of<MyProvider>(context, listen: false).auth.currentUser!.displayName} called you",
+      //     value ,
+      //     Provider.of<MyProvider>(context, listen: false).auth.currentUser!.email);
+    });
+  } else {
+    // notifyUser("${Provider.of<MyProvider>(context, listen: false).auth.currentUser!.displayName}",
+    //     "${Provider.of<MyProvider>(context, listen: false).auth.currentUser!.displayName} called you",
+    //     Provider.of<MyProvider>(context, listen: false).peerUserData!["email"] ,
+    //     Provider.of<MyProvider>(context, listen: false).auth.currentUser!.email);
+  }
+  Navigator.pushReplacementNamed(
+    context,
+    AppRoutes.home,
+  );
+
+  Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      fontSize: 16.0);
+  Provider.of<AuthProvider>(context, listen: false).updateCallStatus("");
+}
 
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> buildShowSnackBar(
     BuildContext context, String msg) {

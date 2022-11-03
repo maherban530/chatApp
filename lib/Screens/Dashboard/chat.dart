@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../Core/route_path.dart';
 import '../../Widgets/last_seen_chat.dart';
 import '../../Widgets/message_compose.dart';
 import '../../Widgets/messages.dart';
@@ -139,6 +140,10 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                 //   "video"
                 // );
                 // Navigator.pushNamed(context, 'video_call');
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.videocall,
+                );
               },
               icon: const Icon(Icons.videocam)),
           IconButton(
@@ -150,6 +155,10 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
               //     "audio"
               // );
               // Navigator.pushNamed(context, 'audio_call');
+              Navigator.pushNamed(
+                context,
+                AppRoutes.audiocall,
+              );
             },
             icon: const Icon(Icons.call),
           ),

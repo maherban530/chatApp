@@ -2,6 +2,7 @@ import 'package:chat_app/Utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import "dart:math" as math;
 
 import '../Core/theme.dart';
 import '../Models/messages_model.dart';
@@ -238,6 +239,13 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.rotationY(math.pi),
+                child: CustomPaint(
+                  painter: CustomShape(applicationTheme.primaryColor),
+                ),
+              ),
               messageBuilder(context),
               Padding(
                 padding: const EdgeInsets.all(2),
@@ -271,5 +279,27 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
             ],
           ),
         ));
+  }
+}
+
+class CustomShape extends CustomPainter {
+  final Color bgColor;
+
+  CustomShape(this.bgColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()..color = bgColor;
+
+    var path = Path();
+    path.lineTo(-7, 0);
+    path.lineTo(0, 10);
+    path.lineTo(5, 0);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
   }
 }

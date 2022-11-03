@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 
+class AgoraData {
+  static const appId = '50bb2c4882cc4da6915175f607cab484';
+  static const tokenUrl =
+      'https://agora-node-tokenserver.maherbanhusensu.repl.co/access_token?channelName=';
+  // static const token =
+  //     '007eJxTYLC+PDk21qW1XOxE1+uvWc5lff8eheo+Dlj6Oueoc+iNTVUKDKYGSUlGySYWFkbJySYpiWaWhqaG5qZpZgbmyYlJJhYmct8SkxsCGRmuxfMzMTJAIIjPzpCckVjiWFDAwAAANB4h4w==';
+}
+
 class Constants {
   static const String USER_ID = "userId";
   static const String TITLE = "Magic Kass";

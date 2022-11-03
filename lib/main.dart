@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:chat_app/Provider/auth_provider.dart';
 import 'package:chat_app/Provider/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -9,15 +13,91 @@ import 'Core/route_path.dart';
 import 'Core/theme.dart';
 import 'Notifications/notification.dart';
 import 'Provider/provider_collection.dart';
+import 'Provider/shared_prafrence.dart';
+import 'Screens/Dashboard/call_check.dart';
+import 'Widgets/utils.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   _initializeFirebase();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  StreamSubscription<ReceivedAction>? _actionStreamSubscription;
+  bool subscribedActionStream = false;
+
+  @override
+  void initState() {
+    super.initState();
+    listen();
+    if (!subscribedActionStream) {
+      // AwesomeNotifications().setListeners(
+      //   onActionReceivedMethod: onActionReceivedMethod,
+      //   // NotificationController.onActionReceivedMethod,
+      //   // onNotificationCreatedMethod:    NotificationController.onNotificationCreatedMethod,
+      //   // onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
+      //   // onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod
+      // );
+      AwesomeNotifications().actionStream.listen((action) {
+        if (action.buttonKeyPressed == "Answer") {
+          getCallType().then((value) {
+            MyApp.navigatorKey.currentState?.push(
+                MaterialPageRoute(builder: (context) => CallScreen(value)));
+          });
+        } else if (action.buttonKeyPressed == "Cancel") {
+          Provider.of<AuthProvider>(MyApp.navigatorKey.currentState!.context,
+                  listen: false)
+              .updateCallStatus("false");
+          cancelCall(context, "You cancel the call");
+        }
+      });
+      subscribedActionStream = true;
+    }
+  }
+
+  // static Future<void> onActionReceivedMethod(ReceivedAction action) async {
+  //   if (action.buttonKeyPressed == "Answer") {
+  //     getCallType().then((value) {
+  //       MyApp.navigatorKey.currentState
+  //           ?.push(MaterialPageRoute(builder: (context) => CallScreen(value)));
+
+  //       // Get.off(CallScreen(value));
+  //     });
+  //   } else if (action.buttonKeyPressed == "Cancel") {
+  //     Provider.of<AuthProvider>(MyApp.navigatorKey.currentState!.context,
+  //             listen: false)
+  //         .updateCallStatus("false");
+  //     cancelCall(
+  //         MyApp.navigatorKey.currentState!.context, "You cancel the call");
+  //   }
+  // }
+
+  void listen() async {
+    // You can choose to cancel any exiting subscriptions
+    await _actionStreamSubscription?.cancel();
+    // assign the stream subscription
+    // _actionStreamSubscription = AwesomeNotifications().actionStream.listen((message) {
+    // //   // handle stuff here
+    // });
+  }
+
+  @override
+  void dispose() async {
+    Future.delayed(Duration.zero, () async {
+      await _actionStreamSubscription?.cancel();
+    });
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +164,11 @@ class MyApp extends StatelessWidget {
 }
 
 _initializeFirebase() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  notificationCallInitialization();
   await notificationInitialization();
   FirebaseMessaging.onBackgroundMessage(messageHandler);
+  notificationCallInitialization();
   firebaseMessagingListener();
   // await notificationInitialize();
 

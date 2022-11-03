@@ -271,6 +271,7 @@ class _SignUp extends State<SignUp> {
       phoneNumber: phone,
       userStatus: 'Online',
       fcmToken: '',
+      chatWith: '',
       uid: '',
     );
 
