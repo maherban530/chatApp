@@ -1,6 +1,9 @@
+import 'package:chat_app/Widgets/message_buble_shape.dart';
+import 'package:chat_app/Widgets/sender_message_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import "dart:math" as math;
 
 import '../Core/theme.dart';
 import '../Models/messages_model.dart';
@@ -226,13 +229,27 @@ class _ReceiverMessageCardState extends State<ReceiverMessageCard> {
         child: Card(
           color: applicationTheme.cardColor,
           elevation: 1,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(8.0),
+              topLeft: Radius.zero,
+              bottomLeft: Radius.circular(8.0),
+              bottomRight: Radius.circular(8.0),
+            ),
+          ),
           // color: Colors.purple[200],
           margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.rotationY(math.pi),
+                child: CustomPaint(
+                  painter: CustomShape(applicationTheme.cardColor),
+                ),
+              ),
               messageBuilder(context),
               Padding(
                 padding: const EdgeInsets.all(2),

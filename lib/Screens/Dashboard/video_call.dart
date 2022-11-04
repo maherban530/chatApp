@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../../Core/route_path.dart';
+import '../../Notifications/notification.dart';
 import '../../Provider/shared_prafrence.dart';
 import '../../Widgets/utils.dart';
 
@@ -38,6 +39,13 @@ class _VideoCallState extends State<VideoCall> {
   }
 
   Future<void> initAgora() async {
+    sendNotification(
+        'test1',
+        't2',
+        Provider.of<AuthProvider>(context, listen: false)
+            .peerUserData!
+            .fcmToken!,
+        Provider.of<AuthProvider>(context, listen: false).peerUserData!.uid!);
     // retrieve permissions
     await [Permission.microphone, Permission.camera].request();
 

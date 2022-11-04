@@ -1,4 +1,5 @@
 import 'package:chat_app/Utils/constants.dart';
+import 'package:chat_app/Widgets/message_buble_shape.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -232,7 +233,14 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
         alignment: Alignment.centerRight,
         child: Card(
           elevation: 1,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(8.0),
+              topRight: Radius.zero,
+              bottomLeft: Radius.circular(8.0),
+              bottomRight: Radius.circular(8.0),
+            ),
+          ),
           color: applicationTheme.primaryColor,
           margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           child: Column(
@@ -279,27 +287,5 @@ class _SenderMessageCardState extends State<SenderMessageCard> {
             ],
           ),
         ));
-  }
-}
-
-class CustomShape extends CustomPainter {
-  final Color bgColor;
-
-  CustomShape(this.bgColor);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint()..color = bgColor;
-
-    var path = Path();
-    path.lineTo(-7, 0);
-    path.lineTo(0, 10);
-    path.lineTo(5, 0);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
   }
 }

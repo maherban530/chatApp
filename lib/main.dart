@@ -33,36 +33,36 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamSubscription<ReceivedAction>? _actionStreamSubscription;
-  bool subscribedActionStream = false;
+  // StreamSubscription<ReceivedAction>? _actionStreamSubscription;
+  // bool subscribedActionStream = false;
 
   @override
   void initState() {
     super.initState();
-    listen();
-    if (!subscribedActionStream) {
-      // AwesomeNotifications().setListeners(
-      //   onActionReceivedMethod: onActionReceivedMethod,
-      //   // NotificationController.onActionReceivedMethod,
-      //   // onNotificationCreatedMethod:    NotificationController.onNotificationCreatedMethod,
-      //   // onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
-      //   // onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod
-      // );
-      AwesomeNotifications().actionStream.listen((action) {
-        if (action.buttonKeyPressed == "Answer") {
-          getCallType().then((value) {
-            MyApp.navigatorKey.currentState?.push(
-                MaterialPageRoute(builder: (context) => CallScreen(value)));
-          });
-        } else if (action.buttonKeyPressed == "Cancel") {
-          Provider.of<AuthProvider>(MyApp.navigatorKey.currentState!.context,
-                  listen: false)
-              .updateCallStatus("false");
-          cancelCall(context, "You cancel the call");
-        }
-      });
-      subscribedActionStream = true;
-    }
+    // listen();
+    // if (!subscribedActionStream) {
+    // AwesomeNotifications().setListeners(
+    //   onActionReceivedMethod: onActionReceivedMethod,
+    //   // NotificationController.onActionReceivedMethod,
+    //   // onNotificationCreatedMethod:    NotificationController.onNotificationCreatedMethod,
+    //   // onNotificationDisplayedMethod:  NotificationController.onNotificationDisplayedMethod,
+    //   // onDismissActionReceivedMethod:  NotificationController.onDismissActionReceivedMethod
+    // );
+    // AwesomeNotifications().actionStream.listen((action) {
+    //   if (action.buttonKeyPressed == "Answer") {
+    //     getCallType().then((value) {
+    //       MyApp.navigatorKey.currentState?.push(
+    //           MaterialPageRoute(builder: (context) => CallScreen(value)));
+    //     });
+    //   } else if (action.buttonKeyPressed == "Cancel") {
+    //     Provider.of<AuthProvider>(MyApp.navigatorKey.currentState!.context,
+    //             listen: false)
+    //         .updateCallStatus("false");
+    //     cancelCall(context, "You cancel the call");
+    //   }
+    // });
+    //   subscribedActionStream = true;
+    // }
   }
 
   // static Future<void> onActionReceivedMethod(ReceivedAction action) async {
@@ -82,20 +82,20 @@ class _MyAppState extends State<MyApp> {
   //   }
   // }
 
-  void listen() async {
-    // You can choose to cancel any exiting subscriptions
-    await _actionStreamSubscription?.cancel();
-    // assign the stream subscription
-    // _actionStreamSubscription = AwesomeNotifications().actionStream.listen((message) {
-    // //   // handle stuff here
-    // });
-  }
+  // void listen() async {
+  //   // You can choose to cancel any exiting subscriptions
+  //   await _actionStreamSubscription?.cancel();
+  //   // assign the stream subscription
+  //   // _actionStreamSubscription = AwesomeNotifications().actionStream.listen((message) {
+  //   // //   // handle stuff here
+  //   // });
+  // }
 
   @override
   void dispose() async {
-    Future.delayed(Duration.zero, () async {
-      await _actionStreamSubscription?.cancel();
-    });
+    // Future.delayed(Duration.zero, () async {
+    //   await _actionStreamSubscription?.cancel();
+    // });
     super.dispose();
   }
 

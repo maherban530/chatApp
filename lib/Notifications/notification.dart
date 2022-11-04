@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -5,6 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../Models/notification_model.dart';
 import '../Provider/shared_prafrence.dart';
+import 'package:http/http.dart' as http;
+
+const String _serverToken =
+    "AAAAqg87FIg:APA91bEQEPcHmWOpx-VT40TyoyXPXfwo-6JIBwnRHiXby3Z4rOjfotfVu6U-daglXUDVdR40GYPM5B7oO2RFwiJ0gNjBP54nQEuCKtNzRw8c3WvF-gfH8dHn-E1Zqop31uQ60OC-gDZp";
 
 Future<void> notificationInitialization() async {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -191,6 +196,60 @@ Future<void> messageNotification(title, body) async {
     body,
     platformChannelSpecifics,
   );
+}
+
+void sendNotification(
+    String title, String message, String fcmToken, String chatId) async {
+  var response = await http.post(
+    Uri.parse('https://fcm.googleapis.com/fcm/send'),
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'key=$_serverToken',
+    },
+    body: jsonEncode(
+      <String, dynamic>{
+        'notification': <String, dynamic>{
+          'body': message,
+          // AwesomeNotifications().createNotification(
+          //     content: NotificationContent(
+          //       id: 123,
+          //       channelKey: 'Calling',
+          //       title: title,
+          //       body: message,
+          //       autoDismissible: true,
+          //     ),
+          //     actionButtons: [
+          //       NotificationActionButton(
+          //         key: "Answer",
+          //         label: "Answer",
+          //       ),
+          //       NotificationActionButton(
+          //           key: "Cancel", label: "Cancel", color: Colors.red)
+          //     ]),
+          'title': title,
+        },
+        "android": {
+          "notification": {
+            "channel_id": "fcm_default_channel",
+            'sound': 'default'
+          },
+        },
+        /*     "apns": {
+            "payload": {
+              "aps": {"sound": soundFile}
+            }
+          },*/
+        'priority': 'high',
+        'data': <String, dynamic>{
+          'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+          "channel_id": 'fcm_default_channel',
+          'chat_id': chatId
+        },
+        'to': fcmToken,
+      },
+    ),
+  );
+  print(response.statusCode);
 }
 
 Future<void> sendCallNotification(message) async {
