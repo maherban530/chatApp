@@ -55,7 +55,7 @@ class Setting extends StatelessWidget {
               provider.logOut();
               Navigator.pushReplacementNamed(
                 context,
-                AppRoutes.signup,
+                AppRoutes.login,
               );
             },
           ),

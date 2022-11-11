@@ -305,6 +305,13 @@ class AuthProvider extends ChangeNotifier {
     FacebookAuth.instance.logOut();
   }
 
+  void updateFcm(String? fcmToken) {
+    FirebaseFirestore.instance
+        .collection(DatabasePath.userCollection)
+        .doc(currentUserId)
+        .update({'fcmToken': fcmToken});
+  }
+
   Stream<List<Users>> getUsersData() {
     return _firebaseStore
         .collection(DatabasePath.userCollection)

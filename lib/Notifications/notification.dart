@@ -3,13 +3,15 @@ import 'dart:math';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../Models/notification_model.dart';
 import '../Provider/shared_prafrence.dart';
 import 'package:http/http.dart' as http;
 
 const String _serverToken =
-    "AAAAqg87FIg:APA91bEQEPcHmWOpx-VT40TyoyXPXfwo-6JIBwnRHiXby3Z4rOjfotfVu6U-daglXUDVdR40GYPM5B7oO2RFwiJ0gNjBP54nQEuCKtNzRw8c3WvF-gfH8dHn-E1Zqop31uQ60OC-gDZp";
+    "AAAAOBYhxng:APA91bFTqB2eZ2oJMkQe57TTFxfkh-FKgYuEkDoX7I6eqOvlhix-F7OpnjpRsOcbWzH4BJXmlOBihQq035QRKkWCdlylpDGgOEnEV-SuAh7eJ5mWWkbai0Kk0r_r3ggzoWNF9b582C_Z";
+// "AAAAqg87FIg:APA91bEQEPcHmWOpx-VT40TyoyXPXfwo-6JIBwnRHiXby3Z4rOjfotfVu6U-daglXUDVdR40GYPM5B7oO2RFwiJ0gNjBP54nQEuCKtNzRw8c3WvF-gfH8dHn-E1Zqop31uQ60OC-gDZp";
 
 Future<void> notificationInitialization() async {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -51,6 +53,9 @@ Future<void> uploadingNotification(fileType, receiverName, maxProgress, progress
           importance: Importance.max,
           priority: Priority.high,
           onlyAlertOnce: true,
+          // actions: [
+          //   AndroidNotificationAction('1', 'title', titleColor: Colors.red)
+          // ],
           showProgress: progress != maxProgress ? true : false,
           maxProgress: maxProgress,
           progress: progress,
@@ -142,12 +147,15 @@ Future<void> downloadingNotification(
 Future<void> messageHandler(RemoteMessage message) async {
   NotificationMessage notificationMessage =
       NotificationMessage.fromJson(message.data);
+  print('notTest: ${notificationMessage.data!}');
+
   if (notificationMessage.data!.title!.isEmpty) {
     setId(notificationMessage.data!.peerUserId);
     setEmail(notificationMessage.data!.peeredEmail);
     setName(notificationMessage.data!.peeredName);
     setCallType(notificationMessage.data!.callType);
 
+    showCallkitIncoming(notificationMessage.data!.peerUserId!);
     sendCallNotification(notificationMessage.data!.message);
   } else {
     messageNotification(
@@ -159,7 +167,10 @@ void firebaseMessagingListener() {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     NotificationMessage notificationMessage =
         NotificationMessage.fromJson(message.data);
+    print('notTest: ${notificationMessage.data!}');
     if (notificationMessage.data!.title!.isEmpty) {
+      showCallkitIncoming(notificationMessage.data!.peerUserId!);
+
       setId(notificationMessage.data!.peerUserId);
       setName(notificationMessage.data!.peeredName);
       setEmail(notificationMessage.data!.peeredEmail);
@@ -186,6 +197,9 @@ Future<void> messageNotification(title, body) async {
           priority: Priority.high,
           onlyAlertOnce: true,
           showProgress: true,
+          // actions: <AndroidNotificationAction>[
+          //   AndroidNotificationAction('tt', 'uuu')
+          // ],
           autoCancel: false);
 
   NotificationDetails platformChannelSpecifics =
@@ -209,7 +223,10 @@ void sendNotification(
     body: jsonEncode(
       <String, dynamic>{
         'notification': <String, dynamic>{
-          'body': message,
+          'title': title,
+          'body':
+              // ElevatedButton(onPressed: (() {}), child: Text("Accept"))
+              message,
           // AwesomeNotifications().createNotification(
           //     content: NotificationContent(
           //       id: 123,
@@ -226,7 +243,6 @@ void sendNotification(
           //       NotificationActionButton(
           //           key: "Cancel", label: "Cancel", color: Colors.red)
           //     ]),
-          'title': title,
         },
         "android": {
           "notification": {
@@ -243,12 +259,13 @@ void sendNotification(
         'data': <String, dynamic>{
           'click_action': 'FLUTTER_NOTIFICATION_CLICK',
           "channel_id": 'fcm_default_channel',
-          'chat_id': chatId
+          'chat_id': chatId,
         },
         'to': fcmToken,
       },
     ),
   );
+
   print(response.statusCode);
 }
 
@@ -276,4 +293,50 @@ Future<void> sendCallNotification(message) async {
               key: "Cancel", label: "Cancel", color: Colors.red)
         ]);
   }
+}
+
+Future<void> showCallkitIncoming(String uuid) async {
+  var params = <String, dynamic>{
+    'id': uuid,
+    'nameCaller': 'Hien Nguyen',
+    'appName': 'Callkit',
+    'avatar': 'https://i.pravatar.cc/100',
+    'handle': '0123456789',
+    'type': 0,
+    'duration': 30000,
+    'textAccept': 'Accept',
+    'textDecline': 'Decline',
+    'textMissedCall': 'Missed call',
+    'textCallback': 'Call back',
+    'extra': <String, dynamic>{'userId': '1a2b3c4d'},
+    'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
+    'android': <String, dynamic>{
+      'isCustomNotification': true,
+      'isShowLogo': false,
+      'isShowCallback': false,
+      'ringtonePath': 'system_ringtone_default',
+      'backgroundColor': '#0955fa',
+      'backgroundUrl': 'https://i.pravatar.cc/500',
+      'actionColor': '#4CAF50',
+      'incomingCallNotificationChannelName': "Incoming Call",
+      'missedCallNotificationChannelName': "Missed Call",
+    },
+    'ios': <String, dynamic>{
+      'iconName': 'CallKitLogo',
+      'handleType': '',
+      'supportsVideo': true,
+      'maximumCallGroups': 2,
+      'maximumCallsPerCallGroup': 1,
+      'audioSessionMode': 'default',
+      'audioSessionActive': true,
+      'audioSessionPreferredSampleRate': 44100.0,
+      'audioSessionPreferredIOBufferDuration': 0.005,
+      'supportsDTMF': true,
+      'supportsHolding': true,
+      'supportsGrouping': false,
+      'supportsUngrouping': false,
+      'ringtonePath': 'system_ringtone_default'
+    }
+  };
+  await FlutterCallkitIncoming.showCallkitIncoming(params);
 }

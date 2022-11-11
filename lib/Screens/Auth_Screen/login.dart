@@ -1,4 +1,5 @@
 import 'package:chat_app/Screens/Auth_Screen/facebook_demo.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -46,120 +47,101 @@ class _LogIn extends State<LogIn> {
                         vertical: 0.0, horizontal: 20.0),
                     child: Column(
                       children: [
+                        const SizedBox(height: 40),
                         _buildTitle(applicationTheme),
                         _buildEmailAddress(applicationTheme),
                         _buildPassword(applicationTheme),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 0, vertical: 30.0),
-                          child: SizedBox(
-                            height: 60,
-                            width: deviceSize.width,
-                            child: GestureDetector(
-                              onTap: () {
-                                if (_formKey.currentState!.validate()) {
-                                  _onLogInButtonPressed(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  );
-                                }
-                              },
-                              child: Container(
-                                color: ApplicationColors.accentColorLight,
-                                alignment: Alignment.center,
-                                //  decoration: const BoxDecoration(
-                                //     image: DecorationImage(
-                                //         image: AssetImage(
-                                //             'assets/images/welcome_button_bg.png'),
-                                //         fit: BoxFit.fill)),
-                                child: Center(
-                                  child: Text(
-                                    ApplicationTexts.logInButtonName,
-                                    textAlign: TextAlign.center,
-                                    style: applicationTheme.textTheme.bodyText1!
-                                        .copyWith(
-                                            color: ApplicationColors
-                                                .backgroundDark),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            //  ElevatedButton(
-                            //   // style: ButtonStyle(
-                            //   //     backgroundColor:
-                            //   //         MaterialStateProperty.all<Color>(
-                            //   //             Colors.transparent)),
-                            //   // padding: EdgeInsets.zero,
-                            //   child: Center(
-                            //     child: Container(
-                            //       height: 60,
-                            //       width: deviceSize.width,
-                            //       alignment: Alignment.center,
-                            //       child: Text(ApplicationTexts.LETS_START,
-                            //           textAlign: TextAlign.center,
-                            //           style: TextStyle(
-                            //               color: Colors.white,
-                            //               fontSize: 20,
-                            //               fontFamily: "Maccabi",
-                            //               fontWeight: FontWeight.w400)),
-                            //       padding:
-                            //           EdgeInsets.fromLTRB(28, 10, 30, 20),
-                            //       decoration: BoxDecoration(
-                            //           image: DecorationImage(
-                            //               image: AssetImage(
-                            //                   'assets/images/welcome_button_bg.png'),
-                            //               fit: BoxFit.fill)),
-                            //     ),
-                            //   ),
-                            //   onPressed: () {
-                            //     if (_formKey.currentState.validate()) {
-                            //       _onRegisterButtonPressed(
-                            //           _firstNameController.text,
-                            //           _lastNameController.text,
-                            //           _phoneController.text,
-                            //           _emailController.text);
-                            //     }
-                            //   },
-                            // ),
+                        const SizedBox(height: 40),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _onLogInButtonPressed(
+                                  _emailController.text,
+                                  _passwordController.text,
+                                );
+                              }
+                            },
+                            child: const Text(ApplicationTexts.logInButtonName),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   )),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(
-                    context,
-                    AppRoutes.signup,
-                  );
-                },
-                child: const Text('SignUp'),
+              const SizedBox(height: 40),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "Don't have an Account? ",
+                      style: applicationTheme.textTheme.bodyText2,
+                    ),
+                    TextSpan(
+                      text: 'Sign Up',
+                      style: applicationTheme.textTheme.bodyText2!.copyWith(
+                          decoration: TextDecoration.underline,
+                          color: applicationTheme.primaryColor),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.signup,
+                          );
+                        },
+                    ),
+                  ],
+                ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.phonelogin,
-                  );
-                },
-                child: const Text('LogIn with Phone Number'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Provider.of<AuthProvider>(context, listen: false)
-                      .googleSignIn(context);
-                },
-                child: const Text('Google SignIn'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigator.of(context).push(MaterialPageRoute(
-                  //     builder: (context) => const FacebookLogin()));
-
-                  Provider.of<AuthProvider>(context, listen: false)
-                      .facebookSignIn(context);
-                },
-                child: const Text('Facebook SignIn'),
+              const SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  InkWell(
+                    radius: 30,
+                    borderRadius: BorderRadius.circular(26),
+                    child: CircleAvatar(
+                      radius: 26,
+                      backgroundColor:
+                          applicationTheme.primaryColor.withOpacity(0.09),
+                      child: Image.network(
+                          'http://pngimg.com/uploads/google/google_PNG19635.png',
+                          fit: BoxFit.cover),
+                    ),
+                    onTap: () {
+                      Provider.of<AuthProvider>(context, listen: false)
+                          .googleSignIn(context);
+                    },
+                  ),
+                  InkWell(
+                    radius: 30,
+                    borderRadius: BorderRadius.circular(26),
+                    child: Icon(
+                      Icons.facebook_rounded,
+                      color: Colors.blue.shade900,
+                      size: 58,
+                    ),
+                    onTap: () {
+                      Provider.of<AuthProvider>(context, listen: false)
+                          .facebookSignIn(context);
+                    },
+                  ),
+                  InkWell(
+                    radius: 30,
+                    borderRadius: BorderRadius.circular(26),
+                    child: Icon(
+                      Icons.phone_android_rounded,
+                      color: applicationTheme.primaryColor,
+                      size: 58,
+                    ),
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.phonelogin,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -200,14 +182,16 @@ class _LogIn extends State<LogIn> {
         }
       },
       controller: _emailController,
-      style: applicationTheme.textTheme.overline,
-      decoration: _buildInputDecoration(ApplicationTexts.email),
+      style: applicationTheme.textTheme.subtitle1,
+      decoration:
+          _buildInputDecoration(ApplicationTexts.email, applicationTheme),
     );
   }
 
   Widget _buildPassword(ThemeData applicationTheme) {
     return TextFormField(
       controller: _passwordController,
+      obscureText: true,
       validator: (value) {
         if (value!.isEmpty) {
           return ApplicationTexts.passwordIsEmpty;
@@ -217,12 +201,14 @@ class _LogIn extends State<LogIn> {
           return null;
         }
       },
-      style: applicationTheme.textTheme.overline,
-      decoration: _buildInputDecoration(ApplicationTexts.password),
+      style: applicationTheme.textTheme.subtitle1,
+      decoration:
+          _buildInputDecoration(ApplicationTexts.password, applicationTheme),
     );
   }
 
-  InputDecoration _buildInputDecoration(String hint) {
+  InputDecoration _buildInputDecoration(
+      String hint, ThemeData applicationTheme) {
     return InputDecoration(
       contentPadding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
       focusedBorder: const UnderlineInputBorder(
@@ -230,13 +216,12 @@ class _LogIn extends State<LogIn> {
       hintText: hint,
       enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Color.fromRGBO(151, 151, 151, 1))),
-      hintStyle:
-          const TextStyle(color: ApplicationColors.primaryTextColorLight),
+      hintStyle: applicationTheme.textTheme.subtitle1,
       errorStyle: const TextStyle(color: ApplicationColors.errorColor),
       errorBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: ApplicationColors.errorColor)),
       focusedErrorBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(248, 218, 87, 1))),
+          borderSide: BorderSide(color: ApplicationColors.errorColor)),
     );
   }
 

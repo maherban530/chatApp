@@ -46,11 +46,11 @@ class _UserInformationGetState extends State<UserInformationGet> {
 
     return Scaffold(
       // backgroundColor: applicationTheme.backgroundColor,
-      body: _buildBody(),
+      body: _buildBody(applicationTheme),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(ThemeData applicationTheme) {
     return SafeArea(
       child: Center(
         child: SingleChildScrollView(
@@ -61,17 +61,19 @@ class _UserInformationGetState extends State<UserInformationGet> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // addVerticalSpace(_size.width * 0.1),
-                _buildProfileImage(),
-                // addVerticalSpace(_size.width * 0.1),
-                _buildNameTF(),
-                _buildEmail(),
-                const Expanded(child: SizedBox()),
+                const SizedBox(height: 40),
+                _buildProfileImage(applicationTheme),
+                const SizedBox(height: 50),
+                _buildNameTF(applicationTheme),
+                const SizedBox(height: 20),
+                _buildEmail(applicationTheme),
+                // const Expanded(child: SizedBox()),
+                const SizedBox(height: 40),
                 if (_isLoading)
                   const CircularProgressIndicator(
                       // color: AppColors.black,
                       ),
-                const Expanded(child: SizedBox()),
+                // const Expanded(child: SizedBox()),
                 RoundButton(
                   text: 'Save',
                   onPressed: _saveUserInfo,
@@ -85,7 +87,7 @@ class _UserInformationGetState extends State<UserInformationGet> {
     );
   }
 
-  Widget _buildNameTF() {
+  Widget _buildNameTF(ThemeData applicationTheme) {
     return TextField(
       controller: _nameController,
       minLines: 1,
@@ -93,11 +95,7 @@ class _UserInformationGetState extends State<UserInformationGet> {
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.person),
         hintText: 'Name',
-        hintStyle: Theme.of(context).textTheme.displaySmall?.copyWith(
-              // color: AppColors.grey,
-              fontSize: _size.width * 0.05,
-              fontWeight: FontWeight.normal,
-            ),
+        hintStyle: applicationTheme.textTheme.bodyText2,
         isDense: true,
         border: const OutlineInputBorder(),
       ),
@@ -108,19 +106,15 @@ class _UserInformationGetState extends State<UserInformationGet> {
     );
   }
 
-  Widget _buildEmail() {
+  Widget _buildEmail(ThemeData applicationTheme) {
     return TextField(
       controller: _emailController,
       minLines: 1,
       maxLines: 1,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.person),
+        prefixIcon: const Icon(Icons.email),
         hintText: 'Email',
-        hintStyle: Theme.of(context).textTheme.displaySmall?.copyWith(
-              // color: AppColors.grey,
-              fontSize: _size.width * 0.05,
-              fontWeight: FontWeight.normal,
-            ),
+        hintStyle: applicationTheme.textTheme.bodyText2,
         isDense: true,
         border: const OutlineInputBorder(),
       ),
@@ -131,7 +125,7 @@ class _UserInformationGetState extends State<UserInformationGet> {
     );
   }
 
-  Widget _buildProfileImage() {
+  Widget _buildProfileImage(ThemeData applicationTheme) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -139,21 +133,25 @@ class _UserInformationGetState extends State<UserInformationGet> {
             ? CircleAvatar(
                 backgroundImage: FileImage(_imageFile!),
                 radius: _size.width * 0.2,
-                // backgroundColor: AppColors.white,
+                backgroundColor: Colors.transparent,
               )
             : CircleAvatar(
                 backgroundImage: const AssetImage("assets/images/avatar.png"),
                 radius: _size.width * 0.2,
-                // backgroundColor: AppColors.white,
+                backgroundColor: Colors.transparent,
               ),
         Positioned(
           top: (_size.width * 0.5) * 0.55,
           left: (_size.width * 0.5) * 0.55,
-          child: IconButton(
-            onPressed: _selectImage,
-            icon: Icon(
-              Icons.add_a_photo,
-              size: _size.width * 0.1,
+          child: CircleAvatar(
+            backgroundColor: applicationTheme.cardColor,
+            child: IconButton(
+              onPressed: _selectImage,
+              icon: Icon(
+                Icons.add_a_photo,
+                size: 24,
+                color: applicationTheme.primaryColor,
+              ),
             ),
           ),
         ),

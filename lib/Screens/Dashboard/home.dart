@@ -5,6 +5,7 @@ import '../../Core/route_path.dart';
 import '../../Core/theme.dart';
 import '../../Models/messages_model.dart';
 import '../../Models/user_model.dart';
+import '../../Notifications/notifi.dart';
 import '../../Provider/auth_provider.dart';
 
 class Home extends StatefulWidget {
@@ -15,6 +16,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  @override
+  void initState() {
+    // PushNotificationService().startFcm(context);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData applicationTheme = Theme.of(context);

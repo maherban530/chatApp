@@ -200,10 +200,10 @@ class _MessageListState extends State<MessageList> {
                   isScrollVisible = false;
                 });
               } else {
-                setState(() {
-                  provider.updatePeerUserRead(provider.getChatId(), true);
-                  isScrollVisible = true;
-                });
+                // setState(() {
+                provider.updatePeerUserRead(provider.getChatId(), true);
+                isScrollVisible = true;
+                // });
               }
 
               // if (notification is UserScrollNotification) {

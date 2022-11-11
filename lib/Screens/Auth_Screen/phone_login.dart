@@ -15,8 +15,8 @@ class PhoneLoginScreen extends StatefulWidget {
 
 class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
   late Size _size;
-  String? _countryCode;
-  late final TextEditingController _phoneNoController;
+  String? _countryCode = '+91';
+  late TextEditingController _phoneNoController;
   bool _isLoading = false;
 
   @override
@@ -34,35 +34,28 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
   @override
   Widget build(BuildContext context) {
     _size = MediaQuery.of(context).size;
+    ThemeData applicationTheme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: ApplicationColors.backgroundLight,
       appBar: _buildAppBar(),
       body: SizedBox(
         width: _size.width,
-        child: _buildBody(),
+        child: _buildBody(applicationTheme),
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(ThemeData applicationTheme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          _buildInfoText(),
-          TextButton(
-            onPressed: chooseCountryCode,
-            child: Text(
-              'Pick Country',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    // color: AppColors.primary,
-                    fontSize: _size.width * 0.04,
-                  ),
-            ),
-          ),
+          const SizedBox(height: 40),
+          _buildInfoText(applicationTheme),
+          const SizedBox(height: 40),
           _buildCPickerAndNumberTF(),
           const Expanded(child: SizedBox()),
           if (_isLoading)
@@ -79,14 +72,11 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
     );
   }
 
-  Widget _buildInfoText() {
+  Widget _buildInfoText(ThemeData applicationTheme) {
     return Text(
-      'LetsChat will need to verify you phone number',
+      'ChatApp will need to verify you phone number',
       textAlign: TextAlign.center,
-      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            // color: AppColors.black,
-            fontSize: _size.width * 0.04,
-          ),
+      style: applicationTheme.textTheme.bodyText1,
     );
   }
 
@@ -96,7 +86,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
           // color: AppColors.onPrimary,
           ),
       title: Text(
-        'Enter your phone number',
+        'Phone Number Verify',
         style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
               // color: AppColors.onPrimary,
               fontSize: 18.0,
@@ -111,12 +101,28 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          _countryCode ?? '',
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                // color: AppColors.primary,
-                fontSize: _size.width * 0.05,
-              ),
+        // Text(
+        //   _countryCode ?? '',
+        //   style: Theme.of(context).textTheme.displaySmall?.copyWith(
+        //         // color: AppColors.primary,
+        //         fontSize: _size.width * 0.05,
+        //       ),
+        // ),
+        TextButton(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.all(10),
+            shape: CircleBorder(
+              side: BorderSide(width: 2, color: Colors.blue.withOpacity(0.3)),
+            ),
+          ),
+          onPressed: chooseCountryCode,
+          child: Text(
+            _countryCode ?? '',
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  // color: AppColors.primary,
+                  fontSize: _size.width * 0.04,
+                ),
+          ),
         ),
         // addHorizontalSpace(4.0),
         _buildNumberTF(),
@@ -151,6 +157,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
   void chooseCountryCode() {
     showCountryPicker(
       context: context,
+      showPhoneCode: true,
       onSelect: (Country value) {
         setState(() {
           _countryCode = '+${value.phoneCode}';

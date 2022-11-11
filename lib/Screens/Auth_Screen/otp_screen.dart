@@ -17,8 +17,10 @@ class _OTPScreenState extends State<OTPScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _size = MediaQuery.of(context).size;
     verificationId = ModalRoute.of(context)?.settings.arguments as String?;
+    _size = MediaQuery.of(context).size;
+
+    ThemeData applicationTheme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: ApplicationColors.backgroundLight,
@@ -29,8 +31,9 @@ class _OTPScreenState extends State<OTPScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // addVerticalSpace(_size.width * 0.1),
-            _buildInfoText(),
-            // addVerticalSpace(_size.width * 0.08),
+            const SizedBox(height: 40),
+            _buildInfoText(applicationTheme),
+            const SizedBox(height: 40),
             _buildNumberTF(),
           ],
         ),
@@ -53,14 +56,11 @@ class _OTPScreenState extends State<OTPScreen> {
     );
   }
 
-  Widget _buildInfoText() {
+  Widget _buildInfoText(ThemeData applicationTheme) {
     return Text(
       'We have sent an SMS with a code.',
       textAlign: TextAlign.center,
-      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            // color: AppColors.black,
-            fontSize: _size.width * 0.04,
-          ),
+      style: applicationTheme.textTheme.bodyText1,
     );
   }
 

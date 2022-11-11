@@ -41,8 +41,10 @@ class Profile extends StatelessWidget {
                       title: 'Name', getValue: userDetails.name),
                   buildUserInfoDisplay(
                       title: 'Email', getValue: userDetails.email),
-                  buildUserInfoDisplay(
-                      title: 'Phone Number', getValue: userDetails.phoneNumber),
+                  if (userDetails.phoneNumber!.isNotEmpty)
+                    buildUserInfoDisplay(
+                        title: 'Phone Number',
+                        getValue: userDetails.phoneNumber),
                 ],
               );
             }

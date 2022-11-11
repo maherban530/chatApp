@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:chat_app/Provider/auth_provider.dart';
 import 'package:chat_app/Utils/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +16,7 @@ import '../../Core/route_path.dart';
 import '../../Notifications/notification.dart';
 import '../../Provider/shared_prafrence.dart';
 import '../../Widgets/utils.dart';
+import '../../navigation_service.dart';
 
 // const appId = "";
 // const channel = "<-- Insert Channel Name -->";
@@ -26,6 +29,7 @@ class VideoCall extends StatefulWidget {
 }
 
 class _VideoCallState extends State<VideoCall> {
+  late dynamic calling;
   int? _remoteUid;
   bool _localUserJoined = false;
   bool _isMuted = false;
@@ -39,13 +43,14 @@ class _VideoCallState extends State<VideoCall> {
   }
 
   Future<void> initAgora() async {
-    sendNotification(
-        'test1',
-        't2',
-        Provider.of<AuthProvider>(context, listen: false)
-            .peerUserData!
-            .fcmToken!,
-        Provider.of<AuthProvider>(context, listen: false).peerUserData!.uid!);
+    // sendNotification(
+    //     'test1',
+    //     't2',
+    //     Provider.of<AuthProvider>(context, listen: false)
+    //         .peerUserData!
+    //         .fcmToken!,
+    //     Provider.of<AuthProvider>(context, listen: false).peerUserData!.uid!);
+    // sendCallNotification('ttt');
     // retrieve permissions
     await [Permission.microphone, Permission.camera].request();
 
@@ -87,22 +92,25 @@ class _VideoCallState extends State<VideoCall> {
     await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
     await _engine.enableVideo();
     await _engine.startPreview();
+    var endUrl = Provider.of<AuthProvider>(
+            NavigationService.instance.appContext!,
+            listen: false)
+        .getChatId();
+    // FirebaseAuth.instance.currentUser?.uid;
 
     ///token
     final response = await http.get(
-      Uri.parse(AgoraData.tokenUrl +
-          Provider.of<AuthProvider>(context, listen: false).getChatId()),
+      Uri.parse(AgoraData.tokenUrl + endUrl),
     );
 
     if (response.statusCode == 200) {
-      setState(() {
-        token = jsonDecode(response.body)['token'];
-        print(token);
-      });
+      // setState(() {
+      token = jsonDecode(response.body)['token'];
+      print(token);
+      // });
       await _engine.joinChannel(
         token: token,
-        channelId:
-            Provider.of<AuthProvider>(context, listen: false).getChatId(),
+        channelId: endUrl,
         // info: '',
         uid: 0, options: ChannelMediaOptions(),
       );
@@ -143,6 +151,9 @@ class _VideoCallState extends State<VideoCall> {
 
   @override
   void dispose() {
+    if (calling != null) {
+      FlutterCallkitIncoming.endCall(calling);
+    }
     _engine.leaveChannel();
     // engine.disableAudio();
     // timer.cancel();
@@ -152,6 +163,8 @@ class _VideoCallState extends State<VideoCall> {
   // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
+    calling = ModalRoute.of(context)!.settings.arguments;
+    print(calling);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Agora Video Call'),
@@ -190,6 +203,7 @@ class _VideoCallState extends State<VideoCall> {
                     IconButton(
                         iconSize: 50,
                         onPressed: () {
+                          FlutterCallkitIncoming.endCall(calling);
                           Provider.of<AuthProvider>(context, listen: false)
                               .updateCallStatus("false");
                           endCall("You end the call");

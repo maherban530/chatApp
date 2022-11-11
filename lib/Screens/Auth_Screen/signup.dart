@@ -1,5 +1,6 @@
 import 'package:chat_app/Models/user_model.dart';
 import 'package:chat_app/Provider/auth_provider.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +18,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUp extends State<SignUp> {
-  static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  static final GlobalKey<FormState> _formRegKey = GlobalKey<FormState>();
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -43,104 +44,64 @@ class _SignUp extends State<SignUp> {
           child: Column(
             children: [
               Form(
-                  key: _formKey,
+                  key: _formRegKey,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 0.0, horizontal: 20.0),
                     child: Column(
                       children: [
+                        const SizedBox(height: 40),
                         _buildTitle(applicationTheme),
                         _buildFirstName(applicationTheme),
                         _buildPhoneNumber(applicationTheme),
                         _buildEmailAddress(applicationTheme),
                         _buildPassword(applicationTheme),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 0, vertical: 30.0),
-                          child: SizedBox(
-                            height: 60,
-                            width: deviceSize.width,
-                            child: GestureDetector(
-                              onTap: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  _onRegisterButtonPressed(
-                                    _firstNameController.text,
-                                    _phoneController.text,
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  );
-                                }
-                              },
-                              child: Container(
-                                color: ApplicationColors.accentColorLight,
-                                alignment: Alignment.center,
-                                //  decoration: const BoxDecoration(
-                                //     image: DecorationImage(
-                                //         image: AssetImage(
-                                //             'assets/images/welcome_button_bg.png'),
-                                //         fit: BoxFit.fill)),
-                                child: Center(
-                                  child: Text(
-                                    ApplicationTexts.signUpButtonName,
-                                    textAlign: TextAlign.center,
-                                    style: applicationTheme.textTheme.bodyText1!
-                                        .copyWith(
-                                            color: ApplicationColors
-                                                .backgroundDark),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            //  ElevatedButton(
-                            //   // style: ButtonStyle(
-                            //   //     backgroundColor:
-                            //   //         MaterialStateProperty.all<Color>(
-                            //   //             Colors.transparent)),
-                            //   // padding: EdgeInsets.zero,
-                            //   child: Center(
-                            //     child: Container(
-                            //       height: 60,
-                            //       width: deviceSize.width,
-                            //       alignment: Alignment.center,
-                            //       child: Text(ApplicationTexts.LETS_START,
-                            //           textAlign: TextAlign.center,
-                            //           style: TextStyle(
-                            //               color: Colors.white,
-                            //               fontSize: 20,
-                            //               fontFamily: "Maccabi",
-                            //               fontWeight: FontWeight.w400)),
-                            //       padding:
-                            //           EdgeInsets.fromLTRB(28, 10, 30, 20),
-                            //       decoration: BoxDecoration(
-                            //           image: DecorationImage(
-                            //               image: AssetImage(
-                            //                   'assets/images/welcome_button_bg.png'),
-                            //               fit: BoxFit.fill)),
-                            //     ),
-                            //   ),
-                            //   onPressed: () {
-                            //     if (_formKey.currentState.validate()) {
-                            //       _onRegisterButtonPressed(
-                            //           _firstNameController.text,
-                            //           _lastNameController.text,
-                            //           _phoneController.text,
-                            //           _emailController.text);
-                            //     }
-                            //   },
-                            // ),
+                        const SizedBox(height: 40),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_formRegKey.currentState!.validate()) {
+                                _onRegisterButtonPressed(
+                                  _firstNameController.text,
+                                  _phoneController.text,
+                                  _emailController.text,
+                                  _passwordController.text,
+                                );
+                              }
+                            },
+                            child: Text(ApplicationTexts.signUpButtonName
+                                .toUpperCase()),
                           ),
                         ),
                       ],
                     ),
                   )),
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(
-                      context,
-                      AppRoutes.login,
-                    );
-                  },
-                  child: const Text('LogIn')),
+              const SizedBox(height: 40),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Already have an Account? ',
+                      style: applicationTheme.textTheme.bodyText2,
+                    ),
+                    TextSpan(
+                      text: 'Sign In',
+                      style: applicationTheme.textTheme.bodyText2!.copyWith(
+                          decoration: TextDecoration.underline,
+                          color: applicationTheme.primaryColor),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.pop(context);
+                          // Navigator.pushNamed(
+                          //   context,
+                          //   AppRoutes.login,
+                          // );
+                        },
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -177,8 +138,9 @@ class _SignUp extends State<SignUp> {
           return null;
         }
       },
-      style: applicationTheme.textTheme.overline,
-      decoration: _buildInputDecoration(ApplicationTexts.firstName),
+      style: applicationTheme.textTheme.overline!.copyWith(fontSize: 14),
+      decoration:
+          _buildInputDecoration(ApplicationTexts.firstName, applicationTheme),
     );
   }
 
@@ -202,8 +164,9 @@ class _SignUp extends State<SignUp> {
         }
       },
       controller: _phoneController,
-      style: applicationTheme.textTheme.overline,
-      decoration: _buildInputDecoration(ApplicationTexts.phoneNumber),
+      style: applicationTheme.textTheme.overline!.copyWith(fontSize: 14),
+      decoration:
+          _buildInputDecoration(ApplicationTexts.phoneNumber, applicationTheme),
     );
   }
 
@@ -222,14 +185,16 @@ class _SignUp extends State<SignUp> {
         }
       },
       controller: _emailController,
-      style: applicationTheme.textTheme.overline,
-      decoration: _buildInputDecoration(ApplicationTexts.email),
+      style: applicationTheme.textTheme.overline!.copyWith(fontSize: 14),
+      decoration:
+          _buildInputDecoration(ApplicationTexts.email, applicationTheme),
     );
   }
 
   Widget _buildPassword(ThemeData applicationTheme) {
     return TextFormField(
       controller: _passwordController,
+      obscureText: true,
       validator: (value) {
         if (value!.isEmpty) {
           return ApplicationTexts.passwordIsEmpty;
@@ -239,12 +204,14 @@ class _SignUp extends State<SignUp> {
           return null;
         }
       },
-      style: applicationTheme.textTheme.overline,
-      decoration: _buildInputDecoration(ApplicationTexts.password),
+      style: applicationTheme.textTheme.overline!.copyWith(fontSize: 14),
+      decoration:
+          _buildInputDecoration(ApplicationTexts.password, applicationTheme),
     );
   }
 
-  InputDecoration _buildInputDecoration(String hint) {
+  InputDecoration _buildInputDecoration(
+      String hint, ThemeData applicationTheme) {
     return InputDecoration(
       contentPadding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
       focusedBorder: const UnderlineInputBorder(
@@ -252,13 +219,12 @@ class _SignUp extends State<SignUp> {
       hintText: hint,
       enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Color.fromRGBO(151, 151, 151, 1))),
-      hintStyle:
-          const TextStyle(color: ApplicationColors.primaryTextColorLight),
+      hintStyle: applicationTheme.textTheme.subtitle1,
       errorStyle: const TextStyle(color: ApplicationColors.errorColor),
       errorBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: ApplicationColors.errorColor)),
       focusedErrorBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(248, 218, 87, 1))),
+          borderSide: BorderSide(color: ApplicationColors.errorColor)),
     );
   }
 

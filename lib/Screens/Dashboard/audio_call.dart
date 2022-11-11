@@ -13,7 +13,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-// import '../provider/my_provider.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 

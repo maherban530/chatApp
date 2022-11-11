@@ -11,8 +11,10 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  // String? get currentUserId => FirebaseAuth.instance.currentUser?.uid ?? "";
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  // late AnimationController _animController;
+  // late Animation<Offset> _animOffset;
   @override
   void initState() {
     super.initState();
@@ -31,6 +33,25 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       }
     });
+
+    ///animation
+    // _animController = AnimationController(
+    //     vsync: this, duration: const Duration(milliseconds: 500));
+    // final curve =
+    //     CurvedAnimation(curve: Curves.decelerate, parent: _animController);
+    // _animOffset =
+    //     Tween<Offset>(begin: const Offset(0.0, 0.35), end: Offset.zero)
+    //         .animate(curve);
+
+    // // if (widget.delay == null) {
+    // _animController.forward();
+
+    ////////////////////////////////////
+    // } else {
+    //   Timer(Duration(milliseconds: widget.delay), () {
+    //     _animController.forward();
+    //   });
+    // }
   }
   // void initState() {
   //   super.initState();
@@ -68,10 +89,27 @@ class _SplashScreenState extends State<SplashScreen> {
     //   context,
     //   AppRoutes.login,
     // );
-    return const Scaffold(
-      backgroundColor: Colors.green,
-      body: Center(
-        child: Text('Loading...'),
+    return Scaffold(
+      // backgroundColor: Colors.green,
+      body: Stack(
+        // crossAxisAlignment: CrossAxisAlignment.center,
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: const [
+          // FadeTransition(
+          //   opacity: _animController,
+          //   child: SlideTransition(
+          //     position: _animOffset,
+          //     child: const Center(child: Text('ChatApp')),
+          //   ),
+          // ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 30),
+              child: Text('Loading...'),
+            ),
+          )
+        ],
       ),
     );
   }

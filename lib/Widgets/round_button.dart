@@ -18,21 +18,21 @@ class RoundButton extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.only(
           bottom: size.width * 0.05,
-          left: size.width * 0.05,
-          right: size.width * 0.05,
+          // left: size.width * 0.02,
+          // right: size.width * 0.02,
         ),
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(100.0),
+              borderRadius: BorderRadius.circular(10.0),
             ),
           ),
           child: Text(
             text,
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontSize: size.width * 0.04,
-                ),
+            // style: Theme.of(context).textTheme.displaySmall?.copyWith(
+            //       fontSize: size.width * 0.04,
+            //     ),
           ),
         ),
       ),
